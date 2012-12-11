@@ -1,0 +1,41 @@
+So far I have a system that
+
+* automatically saves a backup of the notebook whenever a command is being evaluated, if AutoCommit is on or one can commit manually (using Commit) if ManualCommit is set. This saves space and it makes it easier to undo big chunks.
+
+* Allows an Undo and Redo or jump to a certain version (GotoCommit[n])
+
+* CommitInfo gives information on the commited version.
+
+* CommitClean erases all backup files.
+
+This all works via commands, which leads me to the section of things that are missing and might be added.
+
+* Keyboard shortcuts. Basically we need one shortcut for Undo, Redo and Commit
+
+* Restore the commit list for a file after a restart. Probably via an extra file.
+
+What I am not sure of are these two extension that are probably also possible: 
+* Using DumpSave and Get to backup and restore the memory state. Which might take longer and needs more disk space on big projects, but could definitely be done. The only problem I see is a Redo if the memory state is changed, but solving the restart problem could help here.
+
+* Make autocommits after text was entered - not only on evaluations
+
+Maybe this might be possible too:
+
+* Improve the way undo is implemented, can we only save the changes?
+
+
+
+
+Copyright 2012 Jens Boberski
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
