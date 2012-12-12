@@ -23,11 +23,10 @@ If[MaxVersion+1==RecentVersion,
      Export[
      ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
       CommitList}];
-  ,Print["[WARNING] You are working on an old version. Use CommitForce to commit anyways and delete all newer commits. Autocommit does not work until you switched to the newest verison or used CommitForce"]; RecentVersion--;];
+  ,Print["[WARNING] You are working on an old version. Use CommitForce (alt+d) to commit anyways and delete all newer commits. Autocommit does not work until you switched to the newest verison or used CommitForce"]; RecentVersion--;];
    Print["Version ", RecentVersion]
 	];
        
-
 
 
 CommitForce := 
@@ -138,36 +137,52 @@ FrontEndExecute[
  FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
   {Delimiter, MenuItem["Undo Commit",
     FrontEnd`KernelExecute[
-     nb = SelectedNotebook[];
-     SelectionMove[nb, After, Cell]; 
+     nb = CreateDocument[Null, Visible -> False, WindowSelected -> True];
      NotebookWrite[nb, Cell[BoxData[RowBox[{"Undo"}]], "Input"]];
      SelectionMove[nb, Previous, Cell];
-     SelectionEvaluate[nb]],
+     SelectionEvaluate[nb];
+     NotebookClose[nb]],
     MenuKey["z", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]]
+
 
 FrontEndExecute[
  FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
   {Delimiter, MenuItem["Redo Commit",
     FrontEnd`KernelExecute[
-     nb = SelectedNotebook[];
-     SelectionMove[nb, After, Cell]; 
+     nb = CreateDocument[Null, Visible -> False, WindowSelected -> True];
      NotebookWrite[nb, Cell[BoxData[RowBox[{"Redo"}]], "Input"]];
      SelectionMove[nb, Previous, Cell];
-     SelectionEvaluate[nb]],
+     SelectionEvaluate[nb];
+     NotebookClose[nb]],
     MenuKey["x", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]]
+
 
 FrontEndExecute[
  FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
   {Delimiter, MenuItem["Make a commit",
     FrontEnd`KernelExecute[
-     nb = SelectedNotebook[];
-     SelectionMove[nb, After, Cell]; 
+     nb = CreateDocument[Null, Visible -> False, WindowSelected -> True];
      NotebookWrite[nb, Cell[BoxData[RowBox[{"Commit"}]], "Input"]];
      SelectionMove[nb, Previous, Cell];
-     SelectionEvaluate[nb]],
+     SelectionEvaluate[nb];
+     NotebookClose[nb]],
     MenuKey["s", Modifiers -> {"Command"}],
+    System`MenuEvaluator -> Automatic]}]]
+
+
+
+FrontEndExecute[
+ FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
+  {Delimiter, MenuItem["Make a forced commit",
+    FrontEnd`KernelExecute[
+     nb = CreateDocument[Null, Visible -> False, WindowSelected -> True];
+     NotebookWrite[nb, Cell[BoxData[RowBox[{"CommitForce"}]], "Input"]];
+     SelectionMove[nb, Previous, Cell];
+     SelectionEvaluate[nb];
+     NotebookClose[nb]],
+    MenuKey["d", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]]
 
 (*
