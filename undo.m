@@ -52,9 +52,10 @@ Undo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList},
        If[FileExistsQ[ToString[nb] <> ".undo.mx"], 
 	  {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];]; 
 	   Import["!cp " <> ToString[nb] <> ToString[RecentVersion] <> ".bak" <> " " <> ToString[nb], "Table"]; 
+       If[RecentVersion>0,
            FrontEndExecute[FrontEndToken["Revert"]]; 
            RecentVersion -= 1;
-	   If[RecentVersion<1,RecentVersion = 1; (*Print["Noting to undo"]*)]
+	 ];
            Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
     CommitList}]; 
            (*Print["Version: ", RecentVersion]*)];
@@ -74,6 +75,7 @@ Redo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion,
   Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
     CommitList}]; (*Print["Version: ", RecentVersion]*)];
 
+(*------------GotoCommit-----------_*)
 
 GotoCommit[a_]:=Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
    CommitList}, 
