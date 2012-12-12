@@ -20,9 +20,6 @@ Redo - Undo to the next commit
 
 GotoCommit[n] - Go to the nth version
 
-CommitForce - Using Commit on an old version is blocked. CommitForce erases all newer versions and makes a commit.
-Example: Commited versions are 1,2,3 and 4. After an undo we are working on version 2 now. CommitForce removes versions 3 and 4 and generates a new version 3.
-
 AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made.
 
 ManualCommit - Only do manual commits. Possible issue: The present notebook might not be a commited version, so no redo is possible.
@@ -31,10 +28,10 @@ ManualCommit - Only do manual commits. Possible issue: The present notebook migh
 Keyboard Shortcuts
 ------------------
 
-Alt-z : Undo 
-Alt-x : Redo 
-Alt-s : Commit
-
+Alt+z : Undo 
+Alt+x : Redo 
+Alt+s : Commit
+Alt+d : Print CommitInfo
 
 ------------------------------
 TODO's and possible extensions

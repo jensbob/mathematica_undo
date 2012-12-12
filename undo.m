@@ -10,9 +10,7 @@ Commit :=
       Import[ToString[nb] <> ".undo.mx"];];
 
    If[RecentVersion == 0 || !NumberQ[RecentVersion], 
-    RecentVersion = 1;MaxVersion=0; CommitList = {}, RecentVersion++;];
-
-If[MaxVersion+1==RecentVersion,
+    RecentVersion = 1;MaxVersion=0; CommitList = {}, RecentVersion=MaxVersion+1;];
    MaxVersion = RecentVersion;
    AppendTo[CommitList, {MaxVersion, DateString[]}];
    (*Save the Notebook*)NotebookSave[EvaluationNotebook[], nb];
@@ -23,37 +21,7 @@ If[MaxVersion+1==RecentVersion,
      Export[
      ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
       CommitList}];
-  ,Print["[WARNING] You are working on an old version. Use CommitForce (alt+d) to commit anyways and delete all newer commits. Autocommit does not work until you switched to the newest verison or used CommitForce"]; RecentVersion--;];
-   Print["Version ", RecentVersion]
-	];
-       
-
-
-CommitForce := 
-  Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
-    CommitList},
-   If[FileExistsQ[ToString[nb] <> ".undo.mx"],
-    {RecentVersion, MaxVersion, CommitList} = 
-      Import[ToString[nb] <> ".undo.mx"];];
-   If[RecentVersion == 0 || ! NumberQ[RecentVersion], 
-    RecentVersion = 1; CommitList = {}, RecentVersion++;
-
-    Do[Import["!rm " <> ToString[nb] <> ToString[i] <> ".bak", 
-       "Table"];, {i, RecentVersion + 1, MaxVersion}];
-    CommitList = 
-     DeleteCases[CommitList, {first_, _} /; first >= RecentVersion]];
-   MaxVersion = RecentVersion;
-   AppendTo[CommitList, {MaxVersion, DateString[]}];
-   (*Save the Notebook*)NotebookSave[EvaluationNotebook[], nb];
-   (*Create Backup Copy*)
-   Import["!cp " <> ToString[nb] <> " " <> ToString[nb] <> 
-     ToString[RecentVersion] <> ".bak", "Table"];
-   
-     Export[
-     ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
-      CommitList}];
-   
-   Print["Version: ", RecentVersion]
+(*   Print["Version ", RecentVersion]*)
 	];
 
 (*-------Commit Info------------*)
@@ -84,10 +52,10 @@ Undo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList},
 	   Import["!cp " <> ToString[nb] <> ToString[RecentVersion] <> ".bak" <> " " <> ToString[nb], "Table"]; 
            FrontEndExecute[FrontEndToken["Revert"]]; 
            RecentVersion -= 1;
-	   If[RecentVersion<1,RecentVersion = 1; Print["Noting to undo"]]
+	   If[RecentVersion<1,RecentVersion = 1; (*Print["Noting to undo"]*)]
            Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
     CommitList}]; 
-           Print["Version: ", RecentVersion]];
+           (*Print["Version: ", RecentVersion]*)];
 
 (*-------------REDO-------------------_*)
 
@@ -100,9 +68,9 @@ Redo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion,
   If[RecentVersion < MaxVersion, RecentVersion += 1; 
    Import["!cp " <> ToString[nb] <> ToString[RecentVersion] <> 
      ".bak" <> " " <> ToString[nb], "Table"]; 
-   FrontEndExecute[FrontEndToken["Revert"]];,Print["This is the newest version"]]; 
+   FrontEndExecute[FrontEndToken["Revert"]];,(*Print["This is the newest version"]*)]; 
   Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
-    CommitList}]; Print["Version: ", RecentVersion]];
+    CommitList}]; (*Print["Version: ", RecentVersion]*)];
 
 
 GotoCommit[a_]:=Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
@@ -116,7 +84,7 @@ If[RecentVersion==MaxVersion,Commit;];
 RecentVersion=a;
 Import["!cp "<>ToString[nb]<>ToString[RecentVersion]<>".bak"<> " "<>ToString[nb],"Table"];
 FrontEndExecute[FrontEndToken["Revert"]];,Print["Invalid Version"]];
-Print["Version: ",RecentVersion]
+(*Print["Version: ",RecentVersion]*)
 		      ] 
 
 
@@ -172,18 +140,18 @@ FrontEndExecute[
     System`MenuEvaluator -> Automatic]}]]
 
 
-
 FrontEndExecute[
  FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
-  {Delimiter, MenuItem["Make a forced commit",
+  {Delimiter, MenuItem["Commit infos",
     FrontEnd`KernelExecute[
      nb = CreateDocument[Null, Visible -> False, WindowSelected -> True];
-     NotebookWrite[nb, Cell[BoxData[RowBox[{"CommitForce"}]], "Input"]];
+     NotebookWrite[nb, Cell[BoxData[RowBox[{"CommitInfo"}]], "Input"]];
      SelectionMove[nb, Previous, Cell];
      SelectionEvaluate[nb];
      NotebookClose[nb]],
     MenuKey["d", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]]
+
 
 (*
 Copyright 2012 Jens Boberski
