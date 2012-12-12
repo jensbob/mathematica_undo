@@ -2,7 +2,7 @@ README to undo.m
 
 This package adds a poor mans version control and undo functionality to Mathematica.
 For a previously saved notebook  'notebook.nb' a version info file 'notebook.nb.undo.mx' is created and every time changes are commited a backup file 'notebook.nb[version].bak' is created.
-System menu entries in insert are created.
+System menu entries in "insert" are created.
 
 --------------------------------------
 Usage: Evaluate the following commands
@@ -22,7 +22,7 @@ GotoCommit[n] - Go to the nth version
 
 AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made.
 
-ManualCommit - Only do manual commits. Possible issue: The present notebook might not be a commited version, so no redo is possible.
+ManualCommit - Only do manual commits. 
 
 ------------------
 Keyboard Shortcuts
@@ -43,13 +43,13 @@ TODO's
 
 * If the notebook was not saved yet ask for filename to save it on the first commit.
 
-* Issue with manual commits and changes in the recent version 
+(done) Issue with manual commits and changes in the recent version 
 
 ---------------------
 POSSIBLE IMPROVEMENTS
 ---------------------
 
-* Imporve Commits: If the notebook was not changed, do not make a new commit.
+(done) Imporve Commits: If the notebook was not changed, do not make a new commit.
 
 * Use Dumpsave and Get to backup and restore (at least partly) the memory state.
 

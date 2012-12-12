@@ -10,7 +10,7 @@ Commit :=
          If[FileExistsQ[ToString[nb] <> ".undo.mx"],
             {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];]; (*If there is an undo file load the parameters*)
 
-         If[RecentVersion == 0 || !NumberQ[RecentVersion],   
+         If[!NumberQ[RecentVersion],   
             RecentVersion = 1;MaxVersion=0; CommitList = {}, RecentVersion=MaxVersion+1;]; (*check if parameters are set and add new version*)
 
          MaxVersion = RecentVersion; (*update latest version number*)
@@ -29,7 +29,7 @@ CommitInfo :=
          If[FileExistsQ[ToString[nb] <> ".undo.mx"],
             {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];];
 
-         If[RecentVersion == 0 || ! NumberQ[RecentVersion], 
+         If[! NumberQ[RecentVersion], 
             Print["CommitInfo: Nothing commited"], 
             Print["CommitInfo: Working on version: ", RecentVersion]; 
             Print[TableForm[CommitList]]
@@ -48,17 +48,23 @@ CommitClean :=
 
 (*----------------Undo--------------*)
 
-Undo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList}, 
+Undo := (
+ (*If we are working with the recent version and changed it, make a commit*)
+   If[FileExistsQ[ToString[NotebookFileName[]] <> ".undo.mx"],If[Import[ToString[NotebookFileName[]] <> ".undo.mx"][[1]]==Import[ToString[NotebookFileName[]] <> ".undo.mx"][[2]]&&("ModifiedInMemory" /. NotebookInformation@SelectedNotebook[]),Commit;]; ];
+ (*Undo*)
+    Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList}, 
        If[FileExistsQ[ToString[nb] <> ".undo.mx"], 
 	  {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];]; 
-	   Import["!cp " <> ToString[nb] <> ToString[RecentVersion] <> ".bak" <> " " <> ToString[nb], "Table"]; 
-       If[RecentVersion>0,
-           FrontEndExecute[FrontEndToken["Revert",False]]; 
+
+	   Import["!cp " <> ToString[nb] <> ToString[RecentVersion-1] <> ".bak" <> " " <> ToString[nb], "Table"]; 
+       If[RecentVersion>1,
+           FrontEndExecute[FrontEndToken["Revert",False]];
            RecentVersion -= 1;
 	 ];
            Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
     CommitList}]; 
-           (*Print["Version: ", RecentVersion]*)];
+	   ];
+	);
 
 (*-------------REDO-------------------_*)
 
@@ -113,7 +119,9 @@ FrontEndExecute[
      SelectionMove[nb, Previous, Cell];
      SelectionEvaluate[nb];
      SelectionMove[nb, Previous, Cell]; 
-     NotebookDelete[nb]
+     NotebookDelete[nb];
+     (*Save the Notebook after undo to have the right notebook save satus*)
+     NotebookSave[]
 ],
     MenuKey["z", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]];
@@ -129,7 +137,9 @@ FrontEndExecute[
      SelectionMove[nb, Previous, Cell];
      SelectionEvaluate[nb];
      SelectionMove[nb, Previous, Cell]; 
-     NotebookDelete[nb]
+     NotebookDelete[nb];
+     (*Save the Notebook after redo*)
+     NotebookSave[]
 ],
     MenuKey["x", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]];
@@ -145,7 +155,9 @@ FrontEndExecute[
      SelectionMove[nb, Previous, Cell];
      SelectionEvaluate[nb];
      SelectionMove[nb, Previous, Cell]; 
-     NotebookDelete[nb]
+     NotebookDelete[nb];
+     (*Save the Notebook after undo*)
+     NotebookSave[]
 ],
     MenuKey["s", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]];
