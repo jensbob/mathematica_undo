@@ -1,79 +1,124 @@
 (* ::Package:: *)
 
-Commit:=(
-nb=NotebookFileName[]; (*Notebook Name*)
+(*-------Commit---------------*)
+Commit := 
+  Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
+    CommitList},
 
-(*Check if  first commit*)
-If[RecentVersion[nb]==0||!NumberQ[RecentVersion[nb]],
-RecentVersion[nb]=1; CommitList={},
-RecentVersion[nb]++;
+   If[FileExistsQ[ToString[nb] <> ".undo.mx"],
+    {RecentVersion, MaxVersion, CommitList} = 
+      Import[ToString[nb] <> ".undo.mx"];];
 
-(*Remove higher versions after Undo on a new commit*)
-Do[Import["!rm "<>ToString[nb]<>ToString[i]<>".bak","Table"];,{i,RecentVersion[nb]+1,MaxVersion[nb]}];
+   If[RecentVersion == 0 || !NumberQ[RecentVersion], 
+    RecentVersion = 1;MaxVersion=0; CommitList = {}, RecentVersion++;];
 
-(*Clean up CommitList*)
-CommitList=DeleteCases[CommitList,{first_,_}/;first>=RecentVersion[nb]]
-];
-(*Set RecentVersion as Max and update CommitList*)
-MaxVersion[nb]=RecentVersion[nb];
-AppendTo[CommitList,{MaxVersion[nb],DateString[]}];
+If[MaxVersion+1==RecentVersion,
+   MaxVersion = RecentVersion;
+   AppendTo[CommitList, {MaxVersion, DateString[]}];
+   (*Save the Notebook*)NotebookSave[EvaluationNotebook[], nb];
+   (*Create Backup Copy*)
+   Import["!cp " <> ToString[nb] <> " " <> ToString[nb] <> 
+     ToString[RecentVersion] <> ".bak", "Table"];
+   
+     Export[
+     ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
+      CommitList}];
+  ,Print["[WARNING] You are working on an old version. Use CommitForce to commit anyways and delete all newer commits. Autocommit does not work until you switched to the newest verison or used CommitForce"]; RecentVersion--;];
+   Print["Version ", RecentVersion]
+	];
+       
 
-(*Save the Notebook*)
-NotebookSave[EvaluationNotebook[],nb];
 
-(*Create Backup Copy*)
-Import["!cp "<>ToString[nb]<> " "<>ToString[nb]<>ToString[RecentVersion[nb]]<>".bak","Table"];
-);
 
-(****** INFO AND CLEANING OF COMMITS ****)
+CommitForce := 
+  Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
+    CommitList},
+   If[FileExistsQ[ToString[nb] <> ".undo.mx"],
+    {RecentVersion, MaxVersion, CommitList} = 
+      Import[ToString[nb] <> ".undo.mx"];];
+   If[RecentVersion == 0 || ! NumberQ[RecentVersion], 
+    RecentVersion = 1; CommitList = {}, RecentVersion++;
 
-(*Short Versions Info*)
-CommitInfo:=(
-nb=NotebookFileName[];
-If[RecentVersion[nb]==0||!NumberQ[RecentVersion[nb]],
-Print["CommitInfo: Nothing commited"],
-Print["CommitInfo: Working on version: ",RecentVersion[nb]];TableForm[CommitList]];
-Print["Auto Commit Status: ",AutoCo])
+    Do[Import["!rm " <> ToString[nb] <> ToString[i] <> ".bak", 
+       "Table"];, {i, RecentVersion + 1, MaxVersion}];
+    CommitList = 
+     DeleteCases[CommitList, {first_, _} /; first >= RecentVersion]];
+   MaxVersion = RecentVersion;
+   AppendTo[CommitList, {MaxVersion, DateString[]}];
+   (*Save the Notebook*)NotebookSave[EvaluationNotebook[], nb];
+   (*Create Backup Copy*)
+   Import["!cp " <> ToString[nb] <> " " <> ToString[nb] <> 
+     ToString[RecentVersion] <> ".bak", "Table"];
+   
+     Export[
+     ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
+      CommitList}];
+   
+   Print["Version: ", RecentVersion]
+	];
 
+(*-------Commit Info------------*)
+CommitInfo := 
+ Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
+   CommitList},
+  If[FileExistsQ[ToString[nb] <> ".undo.mx"],
+   {RecentVersion, MaxVersion, CommitList} = 
+     Import[ToString[nb] <> ".undo.mx"];];
+  If[RecentVersion == 0 || ! NumberQ[RecentVersion], 
+   Print["CommitInfo: Nothing commited"], 
+   Print["CommitInfo: Working on version: ", RecentVersion]; 
+   Print[TableForm[CommitList]]];
+  Print["Auto Commit Status: ", TrueQ[AutoCo]]]
+
+(*----------CommitClean---------*)
 (*Removes all backups*)
-CommitClean:=(
-nb=NotebookFileName[];
-Import["!rm "<>ToString[nb]<>"[0-9]*.bak","Table"];
-RecentVersion[nb]=0;
-CommitList={};
-Print["Commit: Clean"]
-);
+CommitClean := Module[{nb = NotebookFileName[]},
+   Import["!rm " <> ToString[nb] <> "[0-9]*.bak", "Table"];
+   Import["!rm " <> ToString[nb] <> ".undo.mx", "Table"];
+   Print["Commit: Clean"]];
+
+(*----------------Undo--------------*)
+
+Undo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList}, 
+       If[FileExistsQ[ToString[nb] <> ".undo.mx"], 
+	  {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];]; 
+	   Import["!cp " <> ToString[nb] <> ToString[RecentVersion] <> ".bak" <> " " <> ToString[nb], "Table"]; 
+           FrontEndExecute[FrontEndToken["Revert"]]; 
+           RecentVersion -= 1;
+	   If[RecentVersion<1,RecentVersion = 1; Print["Noting to undo"]]
+           Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
+    CommitList}]; 
+           Print["Version: ", RecentVersion]];
+
+(*-------------REDO-------------------_*)
+
+Redo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
+   CommitList}, 
+  If[FileExistsQ[
+    ToString[nb] <> 
+     ".undo.mx"], {RecentVersion, MaxVersion, CommitList} = 
+     Import[ToString[nb] <> ".undo.mx"];]; 
+  If[RecentVersion < MaxVersion, RecentVersion += 1; 
+   Import["!cp " <> ToString[nb] <> ToString[RecentVersion] <> 
+     ".bak" <> " " <> ToString[nb], "Table"]; 
+   FrontEndExecute[FrontEndToken["Revert"]];,Print["This is the newest version"]]; 
+  Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
+    CommitList}]; Print["Version: ", RecentVersion]];
 
 
-(*****UNDO, REDO AND GOTO SPEC. VERSION*****)
-Undo:=(
-nb=NotebookFileName[];
-
-If[RecentVersion[nb]>1,(*only if we have something to undo*)
-
-If[!AutoCo&&RecentVersion[nb]==MaxVersion[nb],Commit;];(*If we are on the latest version, make a commit if auto commit is off - this does not check if the commit is really needed but otherwise it is possible to undo uncommited work *)
-
-(*Load Previous Version*)
-RecentVersion[nb]-=1;
-Import["!cp "<>ToString[nb]<>ToString[RecentVersion[nb]]<>".bak"<> " "<>ToString[nb],"Table"];
-FrontEndExecute[FrontEndToken["Revert"]];];
-Print["Version: ",RecentVersion[nb]])
-
-Redo:=(
-nb=NotebookFileName[];If[RecentVersion[nb]<MaxVersion[nb],RecentVersion[nb]+=1;Import["!cp "<>ToString[nb]<>ToString[RecentVersion[nb]]<>".bak"<> " "<>ToString[nb],"Table"];FrontEndExecute[FrontEndToken["Revert"]];];
-Print["Version: ",RecentVersion[nb]])
-
-
-GotoCommit[a_]:=(
-nb=NotebookFileName[];
-If[a>=1&&a<=MaxVersion[nb]&&RecentVersion[nb]!=0,
-If[RecentVersion[nb]==MaxVersion[nb],Commit;];
-RecentVersion[nb]=a;
-Import["!cp "<>ToString[nb]<>ToString[RecentVersion[nb]]<>".bak"<> " "<>ToString[nb],"Table"];
-FrontEndExecute[FrontEndToken["Revert"]];];
-Print["Version: ",RecentVersion[nb]]
-
-)
+GotoCommit[a_]:=Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
+   CommitList}, 
+  If[FileExistsQ[
+    ToString[nb] <> 
+     ".undo.mx"], {RecentVersion, MaxVersion, CommitList} = 
+     Import[ToString[nb] <> ".undo.mx"];]; 
+If[a>=1&&a<=MaxVersion&&RecentVersion!=0,
+If[RecentVersion==MaxVersion,Commit;];
+RecentVersion=a;
+Import["!cp "<>ToString[nb]<>ToString[RecentVersion]<>".bak"<> " "<>ToString[nb],"Table"];
+FrontEndExecute[FrontEndToken["Revert"]];,Print["Invalid Version"]];
+Print["Version: ",RecentVersion]
+		      ] 
 
 
 (****AUTOCOMMIT******)
@@ -86,10 +131,44 @@ ManualCommit:=(AutoCo=False;
 NotebookEvaluate[Clear@$PreRead];)
 
 
-(****ALSO SAVE THE MEMORY STATE***)
-MemCommit=False;(*Flag*)
 
+(** Keyboard  Shortcuts ***)
 
+FrontEndExecute[
+ FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
+  {Delimiter, MenuItem["Undo Commit",
+    FrontEnd`KernelExecute[
+     nb = SelectedNotebook[];
+     SelectionMove[nb, After, Cell]; 
+     NotebookWrite[nb, Cell[BoxData[RowBox[{"Undo"}]], "Input"]];
+     SelectionMove[nb, Previous, Cell];
+     SelectionEvaluate[nb]],
+    MenuKey["z", Modifiers -> {"Command"}],
+    System`MenuEvaluator -> Automatic]}]]
+
+FrontEndExecute[
+ FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
+  {Delimiter, MenuItem["Redo Commit",
+    FrontEnd`KernelExecute[
+     nb = SelectedNotebook[];
+     SelectionMove[nb, After, Cell]; 
+     NotebookWrite[nb, Cell[BoxData[RowBox[{"Redo"}]], "Input"]];
+     SelectionMove[nb, Previous, Cell];
+     SelectionEvaluate[nb]],
+    MenuKey["x", Modifiers -> {"Command"}],
+    System`MenuEvaluator -> Automatic]}]]
+
+FrontEndExecute[
+ FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
+  {Delimiter, MenuItem["Make a commit",
+    FrontEnd`KernelExecute[
+     nb = SelectedNotebook[];
+     SelectionMove[nb, After, Cell]; 
+     NotebookWrite[nb, Cell[BoxData[RowBox[{"Commit"}]], "Input"]];
+     SelectionMove[nb, Previous, Cell];
+     SelectionEvaluate[nb]],
+    MenuKey["s", Modifiers -> {"Command"}],
+    System`MenuEvaluator -> Automatic]}]]
 
 (*
 Copyright 2012 Jens Boberski

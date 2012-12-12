@@ -1,28 +1,54 @@
-So far I have a system that
+README to undo.m
 
-* automatically saves a backup of the notebook whenever a command is being evaluated, if AutoCommit is on or one can commit manually (using Commit) if ManualCommit is set. This saves space and it makes it easier to undo big chunks.
+This package adds a poor mans version control and undo functionality to Mathematica.
+For a previously saved notebook  'notebook.nb' a version info file 'notebook.nb.undo.mx' is created and every time changes are commited a backup file 'notebook.nb[version].bak' is created.
+System menu entries in insert are created.
 
-* Allows an Undo and Redo or jump to a certain version (GotoCommit[n])
+--------------------------------------
+Usage: Evaluate the following commands
+--------------------------------------
 
-* CommitInfo gives information on the commited version.
+Commit - Making a commit
 
-* CommitClean erases all backup files.
+CommitInfo - Show a list of all Versions
 
-This all works via commands, which leads me to the section of things that are missing and might be added.
+CommitClean - Remove all commited files
 
-* Keyboard shortcuts. Basically we need one shortcut for Undo, Redo and Commit
+Undo - Undo to the previous commit
 
-* Restore the commit list for a file after a restart. Probably via an extra file.
+Redo - Undo to the next commit
 
-What I am not sure of are these two extension that are probably also possible: 
-* Using DumpSave and Get to backup and restore the memory state. Which might take longer and needs more disk space on big projects, but could definitely be done. The only problem I see is a Redo if the memory state is changed, but solving the restart problem could help here.
+GotoCommit[n] - Go to the nth version
+
+CommitForce - Using Commit on an old version is blocked. CommitForce erases all newer versions and makes a commit.
+Example: Commited versions are 1,2,3 and 4. After an undo we are working on version 2 now. CommitForce removes versions 3 and 4 and generates a new version 3.
+
+AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made.
+
+ManualCommit - Only do manual commits. Possible issue: The present notebook might not be a commited version, so no redo is possible.
+
+------------------
+Keyboard Shortcuts
+------------------
+
+Alt-z : Undo 
+Alt-x : Redo 
+Alt-s : Commit
+
+
+------------------------------
+TODO's and possible extensions
+------------------------------
+
+* Check if the package was loaded already, to prevent multiple loads, to prevent creatation of multiple menu entries 
+
+* If the notebook was not saved yet ask for filename to save it on the first commit.
+
+* Imporve Commits: If the notebook was not changed, do not make a new commit.
+
+* Use Dumpsave and Get to backup and restore (at least partly) the memory state.
 
 * Make autocommits after text was entered - not only on evaluations
-
-Maybe this might be possible too:
-
-* Improve the way undo is implemented, can we only save the changes?
-
 
 
 
