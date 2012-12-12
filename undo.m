@@ -1,49 +1,50 @@
 (* ::Package:: *)
-If[!TrueQ[$UNDODEF],
+
+If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 $UNDODEF=True;  
-(*-------Commit---------------*)
+
+(*----Define Commit----*)
 Commit := 
-  Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
-    CommitList},
+  Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList},
 
-   If[FileExistsQ[ToString[nb] <> ".undo.mx"],
-    {RecentVersion, MaxVersion, CommitList} = 
-      Import[ToString[nb] <> ".undo.mx"];];
+         If[FileExistsQ[ToString[nb] <> ".undo.mx"],
+            {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];]; (*If there is an undo file load the parameters*)
 
-   If[RecentVersion == 0 || !NumberQ[RecentVersion], 
-    RecentVersion = 1;MaxVersion=0; CommitList = {}, RecentVersion=MaxVersion+1;];
-   MaxVersion = RecentVersion;
-   AppendTo[CommitList, {MaxVersion, DateString[]}];
-   (*Save the Notebook*)NotebookSave[EvaluationNotebook[], nb];
-   (*Create Backup Copy*)
-   Import["!cp " <> ToString[nb] <> " " <> ToString[nb] <> 
-     ToString[RecentVersion] <> ".bak", "Table"];
-   
-     Export[
-     ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
-      CommitList}];
-(*   Print["Version ", RecentVersion]*)
-	];
+         If[RecentVersion == 0 || !NumberQ[RecentVersion],   
+            RecentVersion = 1;MaxVersion=0; CommitList = {}, RecentVersion=MaxVersion+1;]; (*check if parameters are set and add new version*)
 
-(*-------Commit Info------------*)
+         MaxVersion = RecentVersion; (*update latest version number*)
+         AppendTo[CommitList, {MaxVersion, DateString[]}]; (*update commit list*)
+         (*Save the Notebook*)
+         NotebookSave[EvaluationNotebook[], nb];
+         (*Create Backup Copy*)
+         Import["!cp " <> ToString[nb] <> " " <> ToString[nb] <> ToString[RecentVersion] <> ".bak", "Table"];
+	 (*update undo file*)
+         Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, CommitList}];
+  ];
+
+(*----Define Commit Info----*)
 CommitInfo := 
- Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
-   CommitList},
-  If[FileExistsQ[ToString[nb] <> ".undo.mx"],
-   {RecentVersion, MaxVersion, CommitList} = 
-     Import[ToString[nb] <> ".undo.mx"];];
-  If[RecentVersion == 0 || ! NumberQ[RecentVersion], 
-   Print["CommitInfo: Nothing commited"], 
-   Print["CommitInfo: Working on version: ", RecentVersion]; 
-   Print[TableForm[CommitList]]];
-  Print["Auto Commit Status: ", TrueQ[AutoCo]]];
+  Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList},
+         If[FileExistsQ[ToString[nb] <> ".undo.mx"],
+            {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];];
 
-(*----------CommitClean---------*)
+         If[RecentVersion == 0 || ! NumberQ[RecentVersion], 
+            Print["CommitInfo: Nothing commited"], 
+            Print["CommitInfo: Working on version: ", RecentVersion]; 
+            Print[TableForm[CommitList]]
+           ];
+         Print["Auto Commit Status: ", TrueQ[AutoCo]]
+  ];
+
+(*----Define CommitClean-----*)
 (*Removes all backups*)
-CommitClean := Module[{nb = NotebookFileName[]},
-   Import["!rm " <> ToString[nb] <> "[0-9]*.bak", "Table"];
-   Import["!rm " <> ToString[nb] <> ".undo.mx", "Table"];
-   Print["Commit: Clean"]];
+CommitClean := 
+  Module[{nb = NotebookFileName[]},
+         Import["!rm " <> ToString[nb] <> "[0-9]*.bak", "Table"];
+         Import["!rm " <> ToString[nb] <> ".undo.mx", "Table"];
+         Print["Commit: Clean"]
+  ];
 
 (*----------------Undo--------------*)
 
@@ -88,18 +89,17 @@ FrontEndExecute[FrontEndToken["Revert"]];,Print["Invalid Version"]];
 		      ] ;
 
 
-(****AUTOCOMMIT******)
+(*----- Auto and manual commit ----*)
 
+AutoCo=False;(*Flag for auto commit*)
 
 AutoCommit:=(AutoCo=True;NotebookEvaluate[
 $PreRead=(If[!StringFreeQ[ToString[#],{"Undo","Redo","GotoCommit","CommitInfo"}],Null,Commit];#)&];);
 
-ManualCommit:=(AutoCo=False;
-NotebookEvaluate[Clear@$PreRead];);
+ManualCommit:=(AutoCo=False;NotebookEvaluate[Clear@$PreRead];);
 
 
-AutoCo=False;(*Flag for auto commit*)
-(** Keyboard  Shortcuts ***)
+(*----- Keyboard  Shortcuts ----*)
 
 FrontEndExecute[
  FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
@@ -165,6 +165,7 @@ FrontEndExecute[
     System`MenuEvaluator -> Automatic]}]];
  
   ];
+
 (*
 Copyright 2012 Jens Boberski
 
