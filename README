@@ -43,8 +43,6 @@ TODO's
 
 * If the notebook was not saved yet ask for filename to save it on the first commit.
 
-* Bug in GotCommit (update recentversion)
-
 ------------
 IMPROVEMENTS
 ------------

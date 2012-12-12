@@ -81,7 +81,6 @@ GotoCommit[a_]:=Module[{nb = NotebookFileName[], RecentVersion, MaxVersion,
      ".undo.mx"], {RecentVersion, MaxVersion, CommitList} = 
      Import[ToString[nb] <> ".undo.mx"];]; 
 If[a>=1&&a<=MaxVersion&&RecentVersion!=0,
-If[RecentVersion==MaxVersion,Commit;];
 RecentVersion=a;
 Import["!cp "<>ToString[nb]<>ToString[RecentVersion]<>".bak"<> " "<>ToString[nb],"Table"];
 FrontEndExecute[FrontEndToken["Revert"]];,Print["Invalid Version"]];
