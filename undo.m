@@ -53,7 +53,7 @@ Undo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList},
 	  {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];]; 
 	   Import["!cp " <> ToString[nb] <> ToString[RecentVersion] <> ".bak" <> " " <> ToString[nb], "Table"]; 
        If[RecentVersion>0,
-           FrontEndExecute[FrontEndToken["Revert"]]; 
+           FrontEndExecute[FrontEndToken["Revert",False]]; 
            RecentVersion -= 1;
 	 ];
            Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
@@ -71,7 +71,7 @@ Redo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion,
   If[RecentVersion < MaxVersion, RecentVersion += 1; 
    Import["!cp " <> ToString[nb] <> ToString[RecentVersion] <> 
      ".bak" <> " " <> ToString[nb], "Table"]; 
-   FrontEndExecute[FrontEndToken["Revert"]];(*Print["This is the newest version"]*)]; 
+   FrontEndExecute[FrontEndToken["Revert",False]];(*Print["This is the newest version"]*)]; 
   Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
     CommitList}]; (*Print["Version: ", RecentVersion]*)];
 
@@ -86,7 +86,7 @@ GotoCommit[a_]:=Module[{nb = NotebookFileName[], RecentVersion, MaxVersion,
 If[a>=1&&a<=MaxVersion&&RecentVersion!=0,
 RecentVersion=a;
 Import["!cp "<>ToString[nb]<>ToString[RecentVersion]<>".bak"<> " "<>ToString[nb],"Table"];
-FrontEndExecute[FrontEndToken["Revert"]];,Print["Invalid Version"]];
+FrontEndExecute[FrontEndToken["Revert",False]];,Print["Invalid Version"]];
 (*Print["Version: ",RecentVersion]*)
 		      ] ;
 
