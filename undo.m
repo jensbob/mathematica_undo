@@ -68,7 +68,7 @@ Redo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion,
   If[RecentVersion < MaxVersion, RecentVersion += 1; 
    Import["!cp " <> ToString[nb] <> ToString[RecentVersion] <> 
      ".bak" <> " " <> ToString[nb], "Table"]; 
-   FrontEndExecute[FrontEndToken["Revert"]];,(*Print["This is the newest version"]*)]; 
+   FrontEndExecute[FrontEndToken["Revert"]];(*Print["This is the newest version"]*)]; 
   Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
     CommitList}]; (*Print["Version: ", RecentVersion]*)];
 
