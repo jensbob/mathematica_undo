@@ -31,15 +31,23 @@ Keyboard Shortcuts
 Alt+z : Undo 
 Alt+x : Redo 
 Alt+s : Commit
-Alt+d : Print CommitInfo
+Alt+d : Print CommitInfo at the end of the notebook
 
 ------------------------------
-TODO's and possible extensions
+TODO's
 ------------------------------
 
-* Check if the package was loaded already, to prevent multiple loads, to prevent creatation of multiple menu entries 
+(done) Check if the package was loaded already, to prevent multiple loads, to prevent creatation of multiple menu entries 
+
+* Skip the "Are you sure you want to revert message.	   
 
 * If the notebook was not saved yet ask for filename to save it on the first commit.
+
+* Bug in GotCommit (update recentversion)
+
+------------
+IMPROVEMENTS
+------------
 
 * Imporve Commits: If the notebook was not changed, do not make a new commit.
 

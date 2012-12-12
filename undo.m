@@ -1,5 +1,6 @@
 (* ::Package:: *)
-
+If[!TrueQ[$UNDODEF],
+$UNDODEF=True;  
 (*-------Commit---------------*)
 Commit := 
   Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
@@ -35,7 +36,7 @@ CommitInfo :=
    Print["CommitInfo: Nothing commited"], 
    Print["CommitInfo: Working on version: ", RecentVersion]; 
    Print[TableForm[CommitList]]];
-  Print["Auto Commit Status: ", TrueQ[AutoCo]]]
+  Print["Auto Commit Status: ", TrueQ[AutoCo]]];
 
 (*----------CommitClean---------*)
 (*Removes all backups*)
@@ -85,74 +86,86 @@ RecentVersion=a;
 Import["!cp "<>ToString[nb]<>ToString[RecentVersion]<>".bak"<> " "<>ToString[nb],"Table"];
 FrontEndExecute[FrontEndToken["Revert"]];,Print["Invalid Version"]];
 (*Print["Version: ",RecentVersion]*)
-		      ] 
+		      ] ;
 
 
 (****AUTOCOMMIT******)
 
-AutoCo=False;(*Flag for auto commit*)
 
 AutoCommit:=(AutoCo=True;NotebookEvaluate[
 $PreRead=(If[!StringFreeQ[ToString[#],{"Undo","Redo","GotoCommit","CommitInfo"}],Null,Commit];#)&];);
+
 ManualCommit:=(AutoCo=False;
-NotebookEvaluate[Clear@$PreRead];)
+NotebookEvaluate[Clear@$PreRead];);
 
 
-
+AutoCo=False;(*Flag for auto commit*)
 (** Keyboard  Shortcuts ***)
 
 FrontEndExecute[
  FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
   {Delimiter, MenuItem["Undo Commit",
     FrontEnd`KernelExecute[
-     nb = CreateDocument[Null, Visible -> False, WindowSelected -> True];
-     NotebookWrite[nb, Cell[BoxData[RowBox[{"Undo"}]], "Input"]];
+     nb = SelectedNotebook[];
+     SelectionMove[nb, After, Cell]; 
+     NotebookWrite[nb, Cell[BoxData[RowBox[{Undo}]], "Input"]];
      SelectionMove[nb, Previous, Cell];
      SelectionEvaluate[nb];
-     NotebookClose[nb]],
+     SelectionMove[nb, Previous, Cell]; 
+     NotebookDelete[nb]
+],
     MenuKey["z", Modifiers -> {"Command"}],
-    System`MenuEvaluator -> Automatic]}]]
+    System`MenuEvaluator -> Automatic]}]];
 
 
 FrontEndExecute[
  FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
   {Delimiter, MenuItem["Redo Commit",
     FrontEnd`KernelExecute[
-     nb = CreateDocument[Null, Visible -> False, WindowSelected -> True];
-     NotebookWrite[nb, Cell[BoxData[RowBox[{"Redo"}]], "Input"]];
+     nb = SelectedNotebook[];
+     SelectionMove[nb, After, Cell]; 
+     NotebookWrite[nb, Cell[BoxData[RowBox[{Redo}]], "Input"]];
      SelectionMove[nb, Previous, Cell];
      SelectionEvaluate[nb];
-     NotebookClose[nb]],
+     SelectionMove[nb, Previous, Cell]; 
+     NotebookDelete[nb]
+],
     MenuKey["x", Modifiers -> {"Command"}],
-    System`MenuEvaluator -> Automatic]}]]
+    System`MenuEvaluator -> Automatic]}]];
 
 
 FrontEndExecute[
  FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
-  {Delimiter, MenuItem["Make a commit",
+  {Delimiter, MenuItem["Commit this version",
     FrontEnd`KernelExecute[
-     nb = CreateDocument[Null, Visible -> False, WindowSelected -> True];
-     NotebookWrite[nb, Cell[BoxData[RowBox[{"Commit"}]], "Input"]];
+     nb = SelectedNotebook[];
+     SelectionMove[nb, After, Cell]; 
+     NotebookWrite[nb, Cell[BoxData[RowBox[{Commit}]], "Input"]];
      SelectionMove[nb, Previous, Cell];
      SelectionEvaluate[nb];
-     NotebookClose[nb]],
+     SelectionMove[nb, Previous, Cell]; 
+     NotebookDelete[nb]
+],
     MenuKey["s", Modifiers -> {"Command"}],
-    System`MenuEvaluator -> Automatic]}]]
+    System`MenuEvaluator -> Automatic]}]];
 
 
 FrontEndExecute[
  FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
-  {Delimiter, MenuItem["Commit infos",
+  {Delimiter, MenuItem["CommitInfo",
     FrontEnd`KernelExecute[
-     nb = CreateDocument[Null, Visible -> False, WindowSelected -> True];
-     NotebookWrite[nb, Cell[BoxData[RowBox[{"CommitInfo"}]], "Input"]];
+     nb = SelectedNotebook[];
+     SelectionMove[nb, After, Cell]; 
+     NotebookWrite[nb, Cell[BoxData[RowBox[{CommitInfo}]], "Input"]];
      SelectionMove[nb, Previous, Cell];
      SelectionEvaluate[nb];
-     NotebookClose[nb]],
+     SelectionMove[nb, Previous, Cell]; 
+     NotebookDelete[nb]
+],
     MenuKey["d", Modifiers -> {"Command"}],
-    System`MenuEvaluator -> Automatic]}]]
-
-
+    System`MenuEvaluator -> Automatic]}]];
+ 
+  ];
 (*
 Copyright 2012 Jens Boberski
 
