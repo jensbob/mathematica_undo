@@ -22,9 +22,9 @@ Redo - Undo to the next commit
 
 GotoCommit[n] - Go to the nth version
 
-AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made.
+ManualCommit (Default) - Only do commits manually.
 
-ManualCommit - Only do manual commits. Possible issue: The present notebook might not be a commited version, so no redo is possible.
+AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made. (This can lead to a lot of files)
 
 ------------------
 Keyboard Shortcuts
@@ -38,6 +38,8 @@ Alt+d : Print CommitInfo at the end of the notebook
 -------------------
 NOTICE
 ------------------
+
+Possible issue: The present notebook might not be a commited version, so no redo is possible. Especially with ManualCommits
 
 When altering not the latest version, the changes (when running undo or redo) are not saved, only when running 'commit' these changes are changed (with a new highest version number). Only changes to the version with the highest version number are changed upon 'undo'
 
@@ -57,11 +59,13 @@ TODO's
 POSSIBLE IMPROVEMENTS
 ---------------------
 
-* Change in notebook is checked using a system variable. so a manual save can lead to false conclusions. This could be fixed by a real comparison of the files.
+* Change in notebook is checked using a system variable. so a manual save can lead to false conclusions. This could be fixed by a real comparison of the files. or maybe use "FileModificationTime"
 
 * Use Dumpsave and Get to backup and restore (at least partly) the memory state.
 
 * Make autocommits after text was entered - not only on evaluations
+
+* Add a limitation for avaliable undo steps (in autocommit mode)
 
 ---------------------
 DONE
