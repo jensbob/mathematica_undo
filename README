@@ -55,6 +55,7 @@ TODO's
 
 * Manual commmits can still be made multiple times on the same file.
 
+* Add windows support (cp -> copy, rm -> del)
 ---------------------
 POSSIBLE IMPROVEMENTS
 ---------------------
@@ -78,6 +79,8 @@ DONE
 (done) Issue with manual commits and changes in the recent version 
 
 (done) Imporve Commits: If the notebook was not changed, do not make a new commit.
+
+(done) Print commit info in dialog window
 
 -----------------------------------------------------------------
 -----------------------------------------------------------------

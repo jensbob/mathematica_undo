@@ -24,18 +24,33 @@ Commit :=
   ];
 
 (*----Define Commit Info----*)
-CommitInfo := 
-  Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList},
-         If[FileExistsQ[ToString[nb] <> ".undo.mx"],
-            {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];];
 
-         If[! NumberQ[RecentVersion], 
-            Print["CommitInfo: Nothing commited"], 
-            Print["CommitInfo: Working on version: ", RecentVersion]; 
-            Print[TableForm[CommitList]]
-           ];
-         Print["Auto Commit Status: ", TrueQ[AutoCo]]
-  ];
+CommitInfo := 
+ Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
+   CommitList}, 
+  If[FileExistsQ[
+    ToString[nb] <> 
+     ".undo.mx"], {RecentVersion, MaxVersion, CommitList} = 
+     Import[ToString[nb] <> ".undo.mx"];]; 
+  If[! NumberQ[RecentVersion], 
+   CreateDialog[
+    Column[{"Nothing Commited", "", 
+      "Auto Commit Status: " <> ToString[TrueQ[AutoCo]],
+      Row[{}], 
+      Item[DefaultButton[], Alignment -> Center]}], 
+    WindowFrameElements -> {"ResizeArea"}, WindowFrame -> "Normal"],
+
+   CreateDialog[
+    Column[{"Currently working on version: " <> 
+       ToString[RecentVersion], "", 
+      "Auto Commit Status: " <> ToString[TrueQ[AutoCo]], "", 
+      Row[{TableForm[CommitList]}], 
+      Item[DefaultButton[], Alignment -> Center]}], 
+    WindowFrameElements -> {"ResizeArea"}, WindowFrame -> "Normal"];
+    
+    ];
+       ];
+
 
 (*----Define CommitClean-----*)
 (*Removes all backups*)
