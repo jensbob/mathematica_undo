@@ -49,18 +49,19 @@ Weather a commit needs to be made when running undo is checked with a system var
 TODO's
 ------------------------------
 
-* multiple kernels lead to multiple menu entries.
-
 * If the notebook was not saved yet ask for filename to save it on the first commit.
 
-* Manual commmits can still be made multiple times on the same file.
-
 * Add windows support (cp -> copy, rm -> del)
----------------------
-POSSIBLE IMPROVEMENTS
----------------------
+
+-----------------------------------
+POSSIBLE IMPROVEMENTS (future todo)
+-----------------------------------
+
+* multiple kernels lead to multiple menu entries.
 
 * Change in notebook is checked using a system variable. so a manual save can lead to false conclusions. This could be fixed by a real comparison of the files. or maybe use "FileModificationTime"
+
+* Manual commmits can still be made multiple times on the same file.
 
 * Use Dumpsave and Get to backup and restore (at least partly) the memory state.
 
