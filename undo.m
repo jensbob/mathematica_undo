@@ -142,22 +142,23 @@ ManualCommit:=(AutoCo=False;NotebookEvaluate[Clear@$PreRead];);
 FrontEndExecute[FrontEnd`ResetMenusPacket[{Automatic}]]
 (*Reset menus*)
 
+
 FrontEndExecute[
  FrontEnd`AddMenuCommands["Undo",
-  {Delimiter, MenuItem["Undo Commit",
+  {Delimiter, MenuItem["CommitInfo",
     FrontEnd`KernelExecute[
      nb = SelectedNotebook[];
      SelectionMove[nb, After, Cell]; 
-     NotebookWrite[nb, Cell[BoxData[RowBox[{Undo}]], "Input"]];
+     NotebookWrite[nb, Cell[BoxData[RowBox[{CommitInfo}]], "Input"]];
      SelectionMove[nb, Previous, Cell];
      SelectionEvaluate[nb];
      SelectionMove[nb, Previous, Cell]; 
-     NotebookDelete[nb];
-     (*Save the Notebook after undo to have the right notebook save satus*)
-     NotebookSave[]
-],
-    MenuKey["z", Modifiers -> {"Command"}],
+     NotebookDelete[nb]
+			  ],
+    MenuKey["d", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]];
+ 
+  ];
 
 
 FrontEndExecute[
@@ -180,6 +181,24 @@ FrontEndExecute[
 
 FrontEndExecute[
  FrontEnd`AddMenuCommands["Undo",
+  {Delimiter, MenuItem["Undo Commit",
+    FrontEnd`KernelExecute[
+     nb = SelectedNotebook[];
+     SelectionMove[nb, After, Cell]; 
+     NotebookWrite[nb, Cell[BoxData[RowBox[{Undo}]], "Input"]];
+     SelectionMove[nb, Previous, Cell];
+     SelectionEvaluate[nb];
+     SelectionMove[nb, Previous, Cell]; 
+     NotebookDelete[nb];
+     (*Save the Notebook after undo to have the right notebook save satus*)
+     NotebookSave[]
+],
+    MenuKey["z", Modifiers -> {"Command"}],
+    System`MenuEvaluator -> Automatic]}]];
+
+
+FrontEndExecute[
+ FrontEnd`AddMenuCommands["Undo",
   {Delimiter, MenuItem["Commit this version",
     FrontEnd`KernelExecute[
      nb = SelectedNotebook[];
@@ -195,23 +214,6 @@ FrontEndExecute[
     MenuKey["s", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]];
 
-
-FrontEndExecute[
- FrontEnd`AddMenuCommands["Undo",
-  {Delimiter, MenuItem["CommitInfo",
-    FrontEnd`KernelExecute[
-     nb = SelectedNotebook[];
-     SelectionMove[nb, After, Cell]; 
-     NotebookWrite[nb, Cell[BoxData[RowBox[{CommitInfo}]], "Input"]];
-     SelectionMove[nb, Previous, Cell];
-     SelectionEvaluate[nb];
-     SelectionMove[nb, Previous, Cell]; 
-     NotebookDelete[nb]
-],
-    MenuKey["d", Modifiers -> {"Command"}],
-    System`MenuEvaluator -> Automatic]}]];
- 
-  ];
 
 (*
 Copyright 2012 Jens Boberski

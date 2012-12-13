@@ -49,13 +49,11 @@ Weather a commit needs to be made when running undo is checked with a system var
 TODO's (coming soon)
 ------------------------------
 
-
+* add commit clean and gotcommit button to dialog
 
 -----------------------------------
 POSSIBLE IMPROVEMENTS (future todo)
 -----------------------------------
-
-* add commit clean and gotcommit button to dialog
 
 * Change in notebook is checked using a system variable. so a manual save can lead to false conclusions. This could be fixed by a real comparison of the files. or maybe use "FileModificationTime"
 
