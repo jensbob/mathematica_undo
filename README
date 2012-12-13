@@ -1,4 +1,6 @@
 README to undo.m
+--------------------------------------------------------------
+--------------------------------------------------------------
 
 This package adds a poor mans version control and undo functionality to Mathematica.
 For a previously saved notebook  'notebook.nb' a version info file 'notebook.nb.undo.mx' is created and every time changes are commited a backup file 'notebook.nb[version].bak' is created.
@@ -33,28 +35,46 @@ Alt+x : Redo
 Alt+s : Commit
 Alt+d : Print CommitInfo at the end of the notebook
 
+-------------------
+NOTEICE
+------------------
+
+After altering an old version, the changes (when running undo or redo) are not saved, only when running 'commit' these changes are changed with a new highest version number. Only changes to the version with the highest version number are changed upon 'undo'
+
+Weather a commit needs to be made upon undo is checked with a system variable that can be altered by manually saving the document. For best results do not save the notebook manually and turn auto save off.
+
 ------------------------------
 TODO's
 ------------------------------
 
-(done) Check if the package was loaded already, to prevent multiple loads, to prevent creatation of multiple menu entries 
-
-(done) Skip the "Are you sure you want to revert message.	   
+* multiple kernels lead to multiple menu entries.
 
 * If the notebook was not saved yet ask for filename to save it on the first commit.
-
-(done) Issue with manual commits and changes in the recent version 
 
 ---------------------
 POSSIBLE IMPROVEMENTS
 ---------------------
 
-(done) Imporve Commits: If the notebook was not changed, do not make a new commit.
+* Change in notebook is checked using a system variable. so a manual save can lead to false conclusions. This could be fixed by a real comparison of the files.
 
 * Use Dumpsave and Get to backup and restore (at least partly) the memory state.
 
 * Make autocommits after text was entered - not only on evaluations
 
+---------------------
+DONE
+---------------------
+
+(done) Check if the package was loaded already, to prevent multiple loads, to prevent creatation of multiple menu entries 
+
+(done) Skip the "Are you sure you want to revert message.	   
+
+(done) Issue with manual commits and changes in the recent version 
+
+(done) Imporve Commits: If the notebook was not changed, do not make a new commit.
+
+-----------------------------------------------------------------
+-----------------------------------------------------------------
 
 
 Copyright 2012 Jens Boberski
