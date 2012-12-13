@@ -24,7 +24,7 @@ GotoCommit[n] - Go to the nth version
 
 AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made.
 
-ManualCommit - Only do manual commits. 
+ManualCommit - Only do manual commits. Possible issue: The present notebook might not be a commited version, so no redo is possible.
 
 ------------------
 Keyboard Shortcuts
@@ -36,12 +36,12 @@ Alt+s : Commit
 Alt+d : Print CommitInfo at the end of the notebook
 
 -------------------
-NOTEICE
+NOTICE
 ------------------
 
-After altering an old version, the changes (when running undo or redo) are not saved, only when running 'commit' these changes are changed with a new highest version number. Only changes to the version with the highest version number are changed upon 'undo'
+When altering not the latest version, the changes (when running undo or redo) are not saved, only when running 'commit' these changes are changed (with a new highest version number). Only changes to the version with the highest version number are changed upon 'undo'
 
-Weather a commit needs to be made upon undo is checked with a system variable that can be altered by manually saving the document. For best results do not save the notebook manually and turn auto save off.
+Weather a commit needs to be made when running undo is checked with a system variable that can be altered by manually saving the document. Leading to possible loss of changes. For best results do not save the notebook manually and turn auto save off - just use commit to save the work.
 
 ------------------------------
 TODO's
