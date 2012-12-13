@@ -3,8 +3,17 @@
 If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 $UNDODEF=True;  
 
+(* check file save*)
+
+  CheckCommitFile := If[! TrueQ[Quiet[FileExistsQ[NotebookFileName[]]]],CreateDialog[
+    Column[{"You need to save the notebook, in order use the commiting and undo system.", "", Item[DefaultButton[], Alignment -> Center]}], 
+    WindowFrameElements -> {"ResizeArea"}, WindowFrame -> "Normal"];
+Abort[];
+		       ];
+
+
 (*----Define Commit----*)
-Commit := 
+Commit := (CheckCommitFile;
   Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList},
 
          If[FileExistsQ[ToString[nb] <> ".undo.mx"],
@@ -22,10 +31,11 @@ Commit :=
 	 (*update undo file*)
          Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, CommitList}];
   ];
+	  );
 
 (*----Define Commit Info----*)
 
-CommitInfo := 
+CommitInfo :=  (CheckCommitFile;
  Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
    CommitList}, 
   If[FileExistsQ[
@@ -50,20 +60,22 @@ CommitInfo :=
     
     ];
        ];
-
+	       );
 
 (*----Define CommitClean-----*)
 (*Removes all backups*)
 CommitClean := 
+ (CheckCommitFile;
   Module[{nb = NotebookFileName[]},
          Import["!rm " <> ToString[nb] <> "[0-9]*.bak", "Table"];
          Import["!rm " <> ToString[nb] <> ".undo.mx", "Table"];
          Print["Commit: Clean"]
   ];
+ );
 
 (*----------------Undo--------------*)
 
-Undo := (
+Undo := ( CheckCommitFile;
  (*If we are working with the recent version and changed it, make a commit*)
    If[FileExistsQ[ToString[NotebookFileName[]] <> ".undo.mx"],If[Import[ToString[NotebookFileName[]] <> ".undo.mx"][[1]]==Import[ToString[NotebookFileName[]] <> ".undo.mx"][[2]]&&("ModifiedInMemory" /. NotebookInformation@SelectedNotebook[]),Commit;]; ];
  (*Undo*)
@@ -83,7 +95,7 @@ Undo := (
 
 (*-------------REDO-------------------_*)
 
-Redo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
+Redo :=  (CheckCommitFile; Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
    CommitList}, 
   If[FileExistsQ[
     ToString[nb] <> 
@@ -95,10 +107,11 @@ Redo := Module[{nb = NotebookFileName[], RecentVersion, MaxVersion,
    FrontEndExecute[FrontEndToken["Revert",False]];(*Print["This is the newest version"]*)]; 
   Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
     CommitList}]; (*Print["Version: ", RecentVersion]*)];
-
+	 );
 (*------------GotoCommit-----------_*)
 
-GotoCommit[a_]:=Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
+GotoCommit[a_]:= (CheckCommitFile;
+Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, 
    CommitList}, 
   If[FileExistsQ[
     ToString[nb] <> 
@@ -110,7 +123,7 @@ Import["!cp "<>ToString[nb]<>ToString[RecentVersion]<>".bak"<> " "<>ToString[nb]
 FrontEndExecute[FrontEndToken["Revert",False]];,Print["Invalid Version"]];
 (*Print["Version: ",RecentVersion]*)
 		      ] ;
-
+		 );
 
 (*----- Auto and manual commit ----*)
 
