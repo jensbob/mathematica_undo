@@ -51,6 +51,8 @@ TODO's
 
 * If the notebook was not saved yet ask for filename to save it on the first commit.
 
+* Manual commmits can still be made multiple times on the same file.
+
 ---------------------
 POSSIBLE IMPROVEMENTS
 ---------------------
