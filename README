@@ -33,7 +33,7 @@ Keyboard Shortcuts
 Alt+z : Undo 
 Alt+x : Redo 
 Alt+s : Commit
-Alt+d : Print CommitInfo at the end of the notebook
+Alt+d : Show CommitInfo dialog
 
 -------------------
 NOTICE
