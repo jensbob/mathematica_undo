@@ -139,9 +139,11 @@ ManualCommit:=(AutoCo=False;NotebookEvaluate[Clear@$PreRead];);
 
 
 (*----- Keyboard  Shortcuts ----*)
+FrontEndExecute[FrontEnd`ResetMenusPacket[{Automatic}]]
+(*Reset menus*)
 
 FrontEndExecute[
- FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
+ FrontEnd`AddMenuCommands["Undo",
   {Delimiter, MenuItem["Undo Commit",
     FrontEnd`KernelExecute[
      nb = SelectedNotebook[];
@@ -159,7 +161,7 @@ FrontEndExecute[
 
 
 FrontEndExecute[
- FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
+ FrontEnd`AddMenuCommands["Undo",
   {Delimiter, MenuItem["Redo Commit",
     FrontEnd`KernelExecute[
      nb = SelectedNotebook[];
@@ -177,7 +179,7 @@ FrontEndExecute[
 
 
 FrontEndExecute[
- FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
+ FrontEnd`AddMenuCommands["Undo",
   {Delimiter, MenuItem["Commit this version",
     FrontEnd`KernelExecute[
      nb = SelectedNotebook[];
@@ -195,7 +197,7 @@ FrontEndExecute[
 
 
 FrontEndExecute[
- FrontEnd`AddMenuCommands["DuplicatePreviousOutput",
+ FrontEnd`AddMenuCommands["Undo",
   {Delimiter, MenuItem["CommitInfo",
     FrontEnd`KernelExecute[
      nb = SelectedNotebook[];

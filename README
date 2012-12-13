@@ -2,9 +2,9 @@ README to undo.m
 --------------------------------------------------------------
 --------------------------------------------------------------
 
-This package adds a poor mans version control and undo functionality to Mathematica.
+This package adds a poor mans version control and undo functionality to Mathematica notebooks.
+
 For a previously saved notebook  'notebook.nb' a version info file 'notebook.nb.undo.mx' is created and every time changes are commited a backup file 'notebook.nb[version].bak' is created.
-System menu entries in "insert" are created.
 
 --------------------------------------
 Usage: Evaluate the following commands
@@ -39,9 +39,9 @@ Alt+d : Show CommitInfo dialog
 NOTICE
 ------------------
 
-Possible issue: The present notebook might not be a commited version, so no redo is possible. Especially with ManualCommits
+Possible issue: The present notebook might not be a commited version, so no redo is possible. Especially with ManualCommits.
 
-When altering not the latest version, the changes (when running undo or redo) are not saved, only when running 'commit' these changes are changed (with a new highest version number). Only changes to the version with the highest version number are changed upon 'undo'
+When doing changes after an undo (working on not the latest version), the latest changes (when running undo or redo) are not saved, only when running 'commit' these changes are saved (to a new version). Only changes to the version with the highest version number are changed upon 'undo'. Which would be the case most of the time.
 
 Weather a commit needs to be made when running undo is checked with a system variable that can be altered by manually saving the document. Leading to possible loss of changes. For best results do not save the notebook manually and turn auto save off - just use commit to save the work.
 
@@ -49,7 +49,7 @@ Weather a commit needs to be made when running undo is checked with a system var
 TODO's (coming soon)
 ------------------------------
 
-* multiple kernels lead to multiple menu entries - maybe  remove the entries again while keeping keyboard shoutcuts
+
 
 -----------------------------------
 POSSIBLE IMPROVEMENTS (future todo)
@@ -70,6 +70,8 @@ POSSIBLE IMPROVEMENTS (future todo)
 ---------------------
 ADDED FEATURES
 ---------------------
+
+(done) multiple kernels lead to multiple menu entries. Fixed by reseting the menus before menu entries are created
 
 (done) Add windows support (cp -> copy, rm -> del)
 
