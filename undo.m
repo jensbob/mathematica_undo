@@ -50,7 +50,7 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 		     Column[{"Nothing Commited", "", "Auto Commit Status: " <> ToString[TrueQ[AutoCo]],"",Item[DefaultButton[], Alignment -> Right]}]
 			     ],
 		 CreateDialog[
-		     Column[{"Currently working on version: " <> ToString[RecentVersion], "", "Auto Commit Status: " <> ToString[TrueQ[AutoCo]], "", Row[{TableForm[Take[CommitList,-30]]}], "", Item[DefaultButton[], Alignment -> Right]}] (*open dialog with a list of the last 30 versions*)
+		     Column[{"Currently working on version: " <> ToString[RecentVersion], "", "Auto Commit Status: " <> ToString[TrueQ[AutoCo]], "", Row[{TableForm[Take[CommitList,Max[-30,-Length[CommitList]]]]}], "", Item[DefaultButton[], Alignment -> Right]}] (*open dialog with a list of the last 30 versions*)
 			     ];
 		];
 	     ];
