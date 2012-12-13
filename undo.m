@@ -5,7 +5,7 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 
    (* check file save*)
    CheckCommitFile := If[! TrueQ[Quiet[FileExistsQ[NotebookFileName[]]]],
-			 CreateDialog[Column[{"You need to save the notebook, in order use the commiting and undo system.", "", Item[DefaultButton[], Alignment -> Center]}], WindowFrame -> "Normal"];
+			 CreateDialog[Column[{"You need to save the notebook, in order \n to use the commiting and undo system.", "", Item[DefaultButton[], Alignment -> Right]}]];
 			 Abort[];
 			];
    (*Define copy and delete for different operating systmes*)
@@ -48,10 +48,10 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 		]; 
 	      If[! NumberQ[RecentVersion], 
 		 CreateDialog[
-		     Column[{"Nothing Commited", "", "Auto Commit Status: " <> ToString[TrueQ[AutoCo]],"",Item[DefaultButton[], Alignment -> Center]}], WindowFrame -> "Normal"
+		     Column[{"Nothing Commited", "", "Auto Commit Status: " <> ToString[TrueQ[AutoCo]],"",Item[DefaultButton[], Alignment -> Right]}]
 			     ],
 		 CreateDialog[
-		     Column[{"Currently working on version: " <> ToString[RecentVersion], "", "Auto Commit Status: " <> ToString[TrueQ[AutoCo]], "", Row[{TableForm[CommitList]}], Item[DefaultButton[], Alignment -> Center]}], WindowFrame -> "Normal"
+		     Column[{"Currently working on version: " <> ToString[RecentVersion], "", "Auto Commit Status: " <> ToString[TrueQ[AutoCo]], "", Row[{TableForm[Take[CommitList,-30]]}], "", Item[DefaultButton[], Alignment -> Right]}] (*open dialog with a list of the last 30 versions*)
 			     ];
 		];
 	     ];
@@ -213,6 +213,7 @@ FrontEndExecute[
     System`MenuEvaluator -> Automatic]}]];
 
  ];
+
 (*
 Copyright 2012 Jens Boberski
 
