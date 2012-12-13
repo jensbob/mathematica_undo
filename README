@@ -46,16 +46,16 @@ When altering not the latest version, the changes (when running undo or redo) ar
 Weather a commit needs to be made when running undo is checked with a system variable that can be altered by manually saving the document. Leading to possible loss of changes. For best results do not save the notebook manually and turn auto save off - just use commit to save the work.
 
 ------------------------------
-TODO's
+TODO's (coming soon)
 ------------------------------
 
-* Add windows support (cp -> copy, rm -> del)
+* multiple kernels lead to multiple menu entries - maybe  remove the entries again while keeping keyboard shoutcuts
 
 -----------------------------------
 POSSIBLE IMPROVEMENTS (future todo)
 -----------------------------------
 
-* multiple kernels lead to multiple menu entries.
+* add commit clean and gotcommit button to dialog
 
 * Change in notebook is checked using a system variable. so a manual save can lead to false conclusions. This could be fixed by a real comparison of the files. or maybe use "FileModificationTime"
 
@@ -68,8 +68,11 @@ POSSIBLE IMPROVEMENTS (future todo)
 * Add a limitation for avaliable undo steps (in autocommit mode)
 
 ---------------------
-DONE
+ADDED FEATURES
 ---------------------
+
+(done) Add windows support (cp -> copy, rm -> del)
+
 
 (done) If the notebook was not saved yet ask for filename to save it on the first commit.
 

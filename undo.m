@@ -10,7 +10,10 @@ $UNDODEF=True;
     WindowFrameElements -> {"ResizeArea"}, WindowFrame -> "Normal"];
 Abort[];
 		       ];
+(*Define copy and delete for different operating systmes*)
 
+OSCopy=If[$OperatingSystem == "Windows","copy","cp"];
+OSDelete=If[$OperatingSystem == "Windows","del","rm"];
 
 (*----Define Commit----*)
 Commit := (CheckCommitFile;
@@ -27,7 +30,7 @@ Commit := (CheckCommitFile;
          (*Save the Notebook*)
          NotebookSave[EvaluationNotebook[], nb];
          (*Create Backup Copy*)
-         Import["!cp " <> ToString[nb] <> " " <> ToString[nb] <> ToString[RecentVersion] <> ".bak", "Table"];
+         Import["!"<>ToString[OSCopy]<>" "<> ToString[nb] <> " " <> ToString[nb] <> ToString[RecentVersion] <> ".bak", "Table"];
 	 (*update undo file*)
          Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, CommitList}];
   ];
@@ -67,8 +70,8 @@ CommitInfo :=  (CheckCommitFile;
 CommitClean := 
  (CheckCommitFile;
   Module[{nb = NotebookFileName[]},
-         Import["!rm " <> ToString[nb] <> "[0-9]*.bak", "Table"];
-         Import["!rm " <> ToString[nb] <> ".undo.mx", "Table"];
+         Import["!"<>ToString[OSDelete]<>" " <> ToString[nb] <> "[0-9]*.bak", "Table"];
+         Import["!"<>ToString[OSDelete]<>" " <> ToString[nb] <> ".undo.mx", "Table"];
          Print["Commit: Clean"]
   ];
  );
@@ -83,7 +86,7 @@ Undo := ( CheckCommitFile;
        If[FileExistsQ[ToString[nb] <> ".undo.mx"], 
 	  {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];]; 
 
-	   Import["!cp " <> ToString[nb] <> ToString[RecentVersion-1] <> ".bak" <> " " <> ToString[nb], "Table"]; 
+	   Import["!"<>ToString[OSCopy]<>" " <> ToString[nb] <> ToString[RecentVersion-1] <> ".bak" <> " " <> ToString[nb], "Table"]; 
        If[RecentVersion>1,
            FrontEndExecute[FrontEndToken["Revert",False]];
            RecentVersion -= 1;
@@ -102,7 +105,7 @@ Redo :=  (CheckCommitFile; Module[{nb = NotebookFileName[], RecentVersion, MaxVe
      ".undo.mx"], {RecentVersion, MaxVersion, CommitList} = 
      Import[ToString[nb] <> ".undo.mx"];]; 
   If[RecentVersion < MaxVersion, RecentVersion += 1; 
-   Import["!cp " <> ToString[nb] <> ToString[RecentVersion] <> 
+   Import["!"<>ToString[OSCopy]<>" " <> ToString[nb] <> ToString[RecentVersion] <> 
      ".bak" <> " " <> ToString[nb], "Table"]; 
    FrontEndExecute[FrontEndToken["Revert",False]];(*Print["This is the newest version"]*)]; 
   Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, 
@@ -119,7 +122,7 @@ Module[{nb = NotebookFileName[], RecentVersion, MaxVersion,
      Import[ToString[nb] <> ".undo.mx"];]; 
 If[a>=1&&a<=MaxVersion&&RecentVersion!=0,
 RecentVersion=a;
-Import["!cp "<>ToString[nb]<>ToString[RecentVersion]<>".bak"<> " "<>ToString[nb],"Table"];
+Import["!"<>ToString[OSCopy]<>" "<>ToString[nb]<>ToString[RecentVersion]<>".bak"<> " "<>ToString[nb],"Table"];
 FrontEndExecute[FrontEndToken["Revert",False]];,Print["Invalid Version"]];
 (*Print["Version: ",RecentVersion]*)
 		      ] ;
