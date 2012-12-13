@@ -1,30 +1,10 @@
+----------------
 README to undo.m
---------------------------------------------------------------
---------------------------------------------------------------
+----------------
 
 This package adds a poor mans version control and undo functionality to Mathematica notebooks.
 
-For a previously saved notebook  'notebook.nb' a version info file 'notebook.nb.undo.mx' is created and every time changes are commited a backup file 'notebook.nb[version].bak' is created.
-
---------------------------------------
-Usage: Evaluate the following commands
---------------------------------------
-
-Commit - Making a commit
-
-CommitInfo - Show a list of all Versions
-
-CommitClean - Remove all commited files
-
-Undo - Undo to the previous commit
-
-Redo - Undo to the next commit
-
-GotoCommit[n] - Go to the nth version
-
-ManualCommit (Default) - Only do commits manually.
-
-AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made. (This can lead to a lot of files)
+For a 'notebook.nb' a version information file ('notebook.nb.undo.mx') is created and every time changes are commited a backup file ('notebook.nb[version].bak') is created. Keyboard shortcuts allow an easy way to commit versions and move in between them.
 
 ------------------
 Keyboard Shortcuts
@@ -35,25 +15,41 @@ Alt+x : Redo
 Alt+s : Commit
 Alt+d : Show CommitInfo dialog
 
--------------------
+--------------------------------------
+Usage: Evaluate the following commands
+--------------------------------------
+
+Commit - Making a commit
+CommitInfo - Show a list of all Versions
+CommitClean - Remove all commited files
+
+Undo - Undo to the previous commit
+Redo - Undo to the next commit
+GotoCommit[n] - Go to the nth version
+
+ManualCommit (Default) - Only do commits manually.
+AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made. (This can lead to a lot of files)
+
+------
 NOTICE
-------------------
+------
 
 Possible issue: The present notebook might not be a commited version, so no redo is possible. Especially with ManualCommits.
-
 When doing changes after an undo (working on not the latest version), the latest changes (when running undo or redo) are not saved, only when running 'commit' these changes are saved (to a new version). Only changes to the version with the highest version number are changed upon 'undo'. Which would be the case most of the time.
 
 Weather a commit needs to be made when running undo is checked with a system variable that can be altered by manually saving the document. Leading to possible loss of changes. For best results do not save the notebook manually and turn auto save off - just use commit to save the work.
 
-------------------------------
-TODO's (coming soon)
-------------------------------
+------
+TODO's
+------
+
+*
+
+----------------------------
+Possible future improvements
+----------------------------
 
 * add commit clean and gotcommit button to dialog
-
------------------------------------
-POSSIBLE IMPROVEMENTS (future todo)
------------------------------------
 
 * Change in notebook is checked using a system variable. so a manual save can lead to false conclusions. This could be fixed by a real comparison of the files. or maybe use "FileModificationTime"
 
@@ -65,9 +61,9 @@ POSSIBLE IMPROVEMENTS (future todo)
 
 * Add a limitation for avaliable undo steps (in autocommit mode)
 
----------------------
-ADDED FEATURES
----------------------
+--------------
+Added features
+--------------
 
 (done) multiple kernels lead to multiple menu entries. Fixed by reseting the menus before menu entries are created
 
@@ -87,7 +83,7 @@ ADDED FEATURES
 (done) Print commit info in dialog window
 
 -----------------------------------------------------------------
------------------------------------------------------------------
+
 
 
 Copyright 2012 Jens Boberski

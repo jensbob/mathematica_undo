@@ -17,17 +17,17 @@ Copyright 2012 Jens Boberski
 Thanks to: 
 
 * Chris Degnen from mathematica.stackexchange.com for his help with keyboard shortcuts.
-http://mathematica.stackexchange.com/questions/16165/how-can-i-set-a-keyboard-shortcut-to-run-a-command
+  http://mathematica.stackexchange.com/questions/16165/how-can-i-set-a-keyboard-shortcut-to-run-a-command
 
 
 * ragfield from mathematica.stackexchange.com for his help on surpressing the revert dialog.
-http://mathematica.stackexchange.com/questions/16200/skip-the-revert-dialog
+  http://mathematica.stackexchange.com/questions/16200/skip-the-revert-dialog
 
 * The whole community at mathematica.stackexchange.com. 
-Sources of code snippets:
+  Questions and answers that were very helpful:
 
-http://mathematica.stackexchange.com/questions/8766/right-aligning-a-button-in-a-dialog
+  http://mathematica.stackexchange.com/questions/8766/right-aligning-a-button-in-a-dialog
 
-http://mathematica.stackexchange.com/questions/1188/knowing-when-a-notebook-has-changed-programmatically
+  http://mathematica.stackexchange.com/questions/1188/knowing-when-a-notebook-has-changed-programmatically
 
-http://mathematica.stackexchange.com/questions/121/saving-mathematica-kernel-state
+  http://mathematica.stackexchange.com/questions/121/saving-mathematica-kernel-state
