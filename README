@@ -19,16 +19,19 @@ Alt+d : Show CommitInfo dialog
 Usage: Evaluate the following commands
 --------------------------------------
 
-Commit - Making a commit
+ManualCommit (Default) - Only do commits manually.
+
+AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made. (This can lead to a lot of files)
+
+CronCommit[n] - makes a new commit every n minutes.
+
+CommitNow - Making a commit
 CommitInfo - Show a list of all Versions
 CommitClean - Remove all commited files
 
 Undo - Undo to the previous commit
 Redo - Undo to the next commit
 GotoCommit[n] - Go to the nth version
-
-ManualCommit (Default) - Only do commits manually.
-AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made. (This can lead to a lot of files)
 
 ------
 NOTICE
@@ -43,7 +46,7 @@ Weather a commit needs to be made when running undo is checked with a system var
 TODO's
 ------
 
-*
+* do some clean up
 
 ----------------------------
 Possible future improvements
@@ -59,11 +62,15 @@ Possible future improvements
 
 * Make autocommits after text was entered - not only on evaluations
 
-* Add a limitation for avaliable undo steps (in autocommit mode)
+* Add a limitation for avaliable undo steps (in autocommit modes to save disk space)
 
 --------------
 Added features
 --------------
+
+(done) added croncommit, to make regular commits based on time
+
+(done) added help entry
 
 (done) multiple kernels lead to multiple menu entries. Fixed by reseting the menus before menu entries are created
 
