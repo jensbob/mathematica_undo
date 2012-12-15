@@ -3,8 +3,9 @@
 If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
    $UNDODEF=True;  
 
+
 (* check file save*)
-   CheckCommitFile := If[! TrueQ[Quiet[FileExistsQ[NotebookFileName[]]]],
+   CheckCommitFile[nb_] := If[! TrueQ[Quiet[FileExistsQ[nb]]],
 			 CreateDialog[Column[{"You need to save the notebook, in order \n to use the commiting and undo system.", "", Item[DefaultButton[], Alignment -> Right]}]];
 			 Abort[];
 			];
@@ -14,10 +15,11 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
    OSDelete=If[$OperatingSystem == "Windows","del","rm"];
 
 (*----Define Commit----*)
-   Commit := (
-       CheckCommitFile;
-       Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList},
+   CommitNow:= Commit[Quiet[NotebookFileName[]]];
 
+   Commit[nb_] := (       
+       Module[{RecentVersion, MaxVersion, CommitList},
+	      CheckCommitFile[nb];
 	      If[FileExistsQ[ToString[nb] <> ".undo.mx"],
 		 {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];
 		]; (*If there is an undo file load the parameters*)
@@ -38,42 +40,40 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 	     );
 
 (*----Define Commit Info----*)
-   CommitInfo := (
-       CheckCommitFile;
-       Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList}, 
+   CommitInfo :=
+       Module[{nb = Quiet[NotebookFileName[]], RecentVersion, MaxVersion, CommitList}, CheckCommitFile[nb];
 	      If[FileExistsQ[ToString[nb] <> ".undo.mx"], 
 		 {RecentVersion, MaxVersion, CommitList} = 
 		 Import[ToString[nb] <> ".undo.mx"];
 		]; 
 	      If[! NumberQ[RecentVersion], 
 		 CreateDialog[
-		     Column[{"Nothing Commited", "", "Auto Commit Status: " <> ToString[TrueQ[AutoCo]],"",Item[DefaultButton[], Alignment -> Right]}]
+		     Column[{"Nothing Commited", "", "Commit mode: " <> ToString[AutoCo],"",Item[DefaultButton[], Alignment -> Right]}]
 			     ],
 		 CreateDialog[
-		     Column[{"Currently working on version: " <> ToString[RecentVersion], "", "Auto Commit Status: " <> ToString[TrueQ[AutoCo]], "", Row[{TableForm[Take[CommitList,Max[-30,-Length[CommitList]]]]}], "", Item[DefaultButton[], Alignment -> Right]}] (*open dialog with a list of the last 30 versions*)
+		     Column[{"Currently working on version: " <> ToString[RecentVersion], "", "Commit mode: " <> ToString[AutoCo], "", Row[{TableForm[Take[CommitList,Max[-30,-Length[CommitList]]]]}], "", Item[DefaultButton[], Alignment -> Right]}] (*open dialog with a list of the last 30 versions*)
 			     ];
 		];
 	     ];
-		 );
 
 (*----Define CommitClean-----*)
    (*Removes all backups*)
-   CommitClean := (
-       CheckCommitFile;
-       Module[{nb = NotebookFileName[]},
+   CommitClean :=
+       Module[{nb = Quiet[NotebookFileName[]]},
+	      CheckCommitFile[nb];
 	      Import["!"<>ToString[OSDelete]<>" " <> ToString[nb] <> "[0-9]*.bak", "Table"];
 	      Import["!"<>ToString[OSDelete]<>" " <> ToString[nb] <> ".undo.mx", "Table"];
 	      Print["Commit: Clean"]
 	     ];
-		  );
+		 
 
 (*----------------Undo--------------*)
    Undo := ( 
-       CheckCommitFile;
+       CheckCommitFile[Quiet[NotebookFileName[]]];
        (*If we are working with the recent version and changed it, make a commit*)
        If[FileExistsQ[ToString[NotebookFileName[]] <> ".undo.mx"],
 	  If[Import[ToString[NotebookFileName[]] <> ".undo.mx"][[1]]==Import[ToString[NotebookFileName[]] <> ".undo.mx"][[2]]&&("ModifiedInMemory" /. NotebookInformation@SelectedNotebook[]),
-	     Commit;
+	     Commit[NotebookFileName[]];
 	    ];
 	 ];
        (*Actual Undo*)
@@ -93,9 +93,9 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 	   );
 
 (*-------Define Redo---------*)
-   Redo := (
-       CheckCommitFile; 
-       Module[{nb = NotebookFileName[], RecentVersion, MaxVersion, CommitList}, 
+   Redo := 
+       Module[{nb = Quiet[NotebookFileName[]], RecentVersion, MaxVersion, CommitList}, 
+	      CheckCommitFile[nb]; 
 	      If[FileExistsQ[ToString[nb] <> ".undo.mx"], 
 		 {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];
 		]; 
@@ -106,12 +106,12 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 		];
 	      Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, CommitList}];
 	     ];
-	   );
+	   
 
 (*------------GotoCommit-----------*)
-   GotoCommit[a_]:= (
-       CheckCommitFile;
-       Module[{nb = NotebookFileName[], RecentVersion, MaxVersion,CommitList}, 
+   GotoCommit[a_]:=
+       Module[{nb = Quiet[NotebookFileName[]], RecentVersion, MaxVersion,CommitList},
+	      CheckCommitFile[nb];
 	      If[FileExistsQ[ToString[nb] <> ".undo.mx"], 
 		 {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];
 		]; 
@@ -121,15 +121,31 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 		 FrontEndExecute[FrontEndToken["Revert",False]];,Print["Invalid Version"]
 		];
 	     ] ;
-		    );
+		
 
 (*----- Auto and manual commit ----*)
-   AutoCo=False;(*Flag for auto commit*)
+   AutoCo="manual";(*Flag for auto commit*)
 
-   AutoCommit:=(AutoCo=True;NotebookEvaluate[$PreRead=(If[!StringFreeQ[ToString[#],{"Undo","Redo","GotoCommit","CommitInfo"}],Null,Commit];#)&];);
+   AutoCommit := Module[{nb = Quiet[NotebookFileName[]]},
+       AutoCo="on evaluation";
+       	      CheckCommitFile[nb];
+       Quiet[RemoveScheduledTask[croncommit[nb]];];
+       NotebookEvaluate[$PreRead=(If[!StringFreeQ[ToString[#],{"Undo","Redo","GotoCommit","CommitInfo"}],Null,Commit[nb]];#)&];];
 
-   ManualCommit:=(AutoCo=False;NotebookEvaluate[Clear@$PreRead];);
-  
+   ManualCommit := Module[{nb = Quiet[NotebookFileName[]]},
+       AutoCo="manual";
+       CheckCommitFile[nb];
+       Quiet[RemoveScheduledTask[croncommit[nb]];];
+       NotebookEvaluate[Clear@$PreRead];];
+
+   CronCommit[n_] := With[{nb = Quiet[NotebookFileName[]]},AutoCo = "every " <> ToString[n] <> " min";
+       CheckCommitFile[nb];
+		      croncommit[nb] = 
+		      CreateScheduledTask[Commit[nb], n*60];
+		      StartScheduledTask[croncommit[nb]];
+			 ];
+
+
 (*----- Keyboard  Shortcuts ----*)
 FrontEndExecute[FrontEnd`ResetMenusPacket[{Automatic}]];
    (*Reset menus*)
@@ -187,23 +203,61 @@ FrontEndExecute[
     MenuKey["z", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]];
 
-
 FrontEndExecute[
  FrontEnd`AddMenuCommands["Undo",
   {Delimiter, MenuItem["Commit this version",
     FrontEnd`KernelExecute[
      nb = SelectedNotebook[];
      SelectionMove[nb, After, Cell]; 
-     NotebookWrite[nb, Cell[BoxData[RowBox[{Commit}]], "Input"]];
+     NotebookWrite[nb, Cell[BoxData[RowBox[{CommitNow}]], "Input"]];
      SelectionMove[nb, Previous, Cell];
      SelectionEvaluate[nb];
      SelectionMove[nb, Previous, Cell]; 
      NotebookDelete[nb];
-     (*Save the Notebook after undo*)
+     (*Save the Notebook after undo to have the right notebook save satus*)
      NotebookSave[]
 ],
     MenuKey["s", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]];
+
+undo::usage="This package adds a poor mans version control and undo functionality to Mathematica notebooks.
+
+For a 'notebook.nb' a version information file ('notebook.nb.undo.mx') is created and every time changes are commited a backup file ('notebook.nb[version].bak') is created. Keyboard shortcuts allow an easy way to commit versions and move in between them.
+
+------------------
+Keyboard Shortcuts
+------------------
+
+Alt+z : Undo 
+Alt+x : Redo 
+Alt+s : Commit
+Alt+d : Show CommitInfo dialog
+
+--------------------------------------
+Usage: Evaluate the following commands
+--------------------------------------
+
+ManualCommit (Default) - Only do commits manually.
+
+AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made. (This can lead to a lot of files)
+
+CronCommit[n] - makes a new commit every n minutes.
+
+CommitNow - Making a commit
+CommitInfo - Show a list of all Versions
+CommitClean - Remove all commited files
+
+Undo - Undo to the previous commit
+Redo - Undo to the next commit
+GotoCommit[n] - Go to the nth version
+";
+
+
+CommitNow::usage="Makes a commit of the current Notebook";
+ManualCommit::usage="Set the commiting mode to manual";
+AutCommit::usage="Commit before the each evaluation";
+CronCommit::usage="CronCommit[n] makes an automatic commit every n minutes";
+
 
  ];
 
