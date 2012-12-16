@@ -3,9 +3,8 @@
 If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
    $UNDODEF=True;  
 
-
-(* check file save*)
-   CheckCommitFile[nb_] := If[! TrueQ[Quiet[FileExistsQ[nb]]],
+(* check file save and shows a dialog if the file was not saved, but only when we are not in autocommit mode*)
+   CheckCommitFile[nb_] := If[! TrueQ[Quiet[FileExistsQ[nb]]]&&AutoCo!="on evaluation",
 			 CreateDialog[Column[{"You need to save the notebook, in order \n to use the commiting and undo system.", "", Item[DefaultButton[], Alignment -> Right]}]];
 			 Abort[];
 			];
@@ -127,10 +126,10 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
    AutoCo="manual";(*Flag for auto commit*)
 
    AutoCommit := Module[{nb = Quiet[NotebookFileName[]]},
+       CheckCommitFile[nb];
        AutoCo="on evaluation";
-       	      CheckCommitFile[nb];
-       Quiet[RemoveScheduledTask[croncommit[nb]];];
-       NotebookEvaluate[$PreRead=(If[!StringFreeQ[ToString[#],{"Undo","Redo","GotoCommit","CommitInfo"}],Null,Commit[nb]];#)&];];
+       Quiet[RemoveScheduledTask[croncommit[NotebookFileName[]]];];
+       NotebookEvaluate[$PreRead=(If[!StringFreeQ[ToString[#],{"Undo","Redo","GotoCommit","CommitInfo","CommitNow","Commit"}],Null,CommitNow];#)&];];
 
    ManualCommit := Module[{nb = Quiet[NotebookFileName[]]},
        AutoCo="manual";
