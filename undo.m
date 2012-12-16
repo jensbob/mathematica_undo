@@ -1,17 +1,68 @@
 (* ::Package:: *)
 
-If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
-   $UNDODEF=True;  
+BeginPackage["undo`"]
 
-(* check file save and shows a dialog if the file was not saved, but only when we are not in autocommit mode*)
-   CheckCommitFile[nb_] := If[! TrueQ[Quiet[FileExistsQ[nb]]]&&AutoCo!="on evaluation",
-			 CreateDialog[Column[{"You need to save the notebook, in order \n to use the commiting and undo system.", "", Item[DefaultButton[], Alignment -> Right]}]];
-			 Abort[];
-			];
+undo::usage="This package adds a poor mans version control and undo functionality to Mathematica notebooks.
+
+For a 'notebook.nb' a version information file ('notebook.nb.undo.mx') is created and every time changes are commited a backup file ('notebook.nb[version].bak') is created. Keyboard shortcuts allow an easy way to commit versions and move in between them.
+
+------------------
+Keyboard Shortcuts
+------------------
+
+Alt+z : Undo 
+Alt+x : Redo 
+Alt+s : Commit
+Alt+d : Show CommitInfo dialog
+
+Functions Defined:
+ManualCommit, AutoCommit, CronCommit[n], CommitInfo, CommitClean, CommitNow Undo, Redo, GotoCommit[n]
+";
+
+
+CommitNow::usage="Makes a commit of the current Notebook.";
+ManualCommit::usage="Set the commiting mode to manual.";
+AutCommit::usage="Commit before the each evaluation.";
+CronCommit::usage="CronCommit[n] makes an automatic commit every n minutes.";
+CommitClean::usage="Deletes all backup files.";
+CommitInfo::usage="Opens a dialog with the commited versions.";
+Undo::usage="Moves back to the previous version. If you are currently working on the latest version (highest version number) the current changes are automaically commited. Otherwise data might be lost.";
+Redo::usage="Moves forward in the commited versions.";
+GotoCommit::usage="GotoCommit[n] loads version n.";
+
+Begin["`Private`"];
+
+warning1 = "You need to save the notebook, in order \n to use the commiting and undo system.";
+AutoCo"manual";
 
 (*Define copy and delete for different operating systmes*)
    OSCopy=If[$OperatingSystem == "Windows","copy","cp"];
    OSDelete=If[$OperatingSystem == "Windows","del","rm"];
+
+(* check file save and shows a dialog if the file was not saved, but only when we are not in autocommit mode*)
+CheckCommitFile[nb_] := 
+    If[! TrueQ[Quiet[FileExistsQ[nb]]]&&AutoCo!="on evaluation",
+       CreateDialog[Column[{warning1, "", Item[DefaultButton[], Alignment -> Right]}]];
+       Abort[];
+      ];
+
+(*----Define Commit Info----*)
+CommitInfo :=
+    Module[{nb = Quiet[NotebookFileName[]], RecentVersion, MaxVersion, CommitList}, 
+	   CheckCommitFile[nb];
+	   If[FileExistsQ[ToString[nb] <> ".undo.mx"], 
+	      {RecentVersion, MaxVersion, CommitList} = 
+	      Import[ToString[nb] <> ".undo.mx"];
+	     ]; 
+	   If[! NumberQ[RecentVersion], 
+	      CreateDialog[
+		  Column[{"Nothing Commited", "", "Commit mode: " <> ToString[AutoCo],"",Item[DefaultButton[], Alignment -> Right]}]
+			  ],
+	      CreateDialog[
+		  Column[{"Currently working on version: " <> ToString[RecentVersion], "", "Commit mode: " <> ToString[AutoCo], "", Row[{TableForm[Take[CommitList,Max[-30,-Length[CommitList]]]]}], "", Item[DefaultButton[], Alignment -> Right]}] (*open dialog with a list of the last 30 versions*)
+			  ];
+	     ];
+	  ];
 
 (*----Define Commit----*)
    CommitNow:= Commit[Quiet[NotebookFileName[]]];
@@ -38,22 +89,6 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 	     ];
 	     );
 
-(*----Define Commit Info----*)
-   CommitInfo :=
-       Module[{nb = Quiet[NotebookFileName[]], RecentVersion, MaxVersion, CommitList}, CheckCommitFile[nb];
-	      If[FileExistsQ[ToString[nb] <> ".undo.mx"], 
-		 {RecentVersion, MaxVersion, CommitList} = 
-		 Import[ToString[nb] <> ".undo.mx"];
-		]; 
-	      If[! NumberQ[RecentVersion], 
-		 CreateDialog[
-		     Column[{"Nothing Commited", "", "Commit mode: " <> ToString[AutoCo],"",Item[DefaultButton[], Alignment -> Right]}]
-			     ],
-		 CreateDialog[
-		     Column[{"Currently working on version: " <> ToString[RecentVersion], "", "Commit mode: " <> ToString[AutoCo], "", Row[{TableForm[Take[CommitList,Max[-30,-Length[CommitList]]]]}], "", Item[DefaultButton[], Alignment -> Right]}] (*open dialog with a list of the last 30 versions*)
-			     ];
-		];
-	     ];
 
 (*----Define CommitClean-----*)
    (*Removes all backups*)
@@ -145,6 +180,13 @@ If[!TrueQ[$UNDODEF], (*only load if not loaded before*)
 			 ];
 
 
+End[];
+
+Protect[ManualCommit, AutoCommit, CronCommit, CommitInfo, CommitClean, CommitNow, Undo, Redo, GotoCommit]
+
+EndPackage[];
+
+
 (*----- Keyboard  Shortcuts ----*)
 FrontEndExecute[FrontEnd`ResetMenusPacket[{Automatic}]];
    (*Reset menus*)
@@ -219,46 +261,8 @@ FrontEndExecute[
     MenuKey["s", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]];
 
-undo::usage="This package adds a poor mans version control and undo functionality to Mathematica notebooks.
-
-For a 'notebook.nb' a version information file ('notebook.nb.undo.mx') is created and every time changes are commited a backup file ('notebook.nb[version].bak') is created. Keyboard shortcuts allow an easy way to commit versions and move in between them.
-
-------------------
-Keyboard Shortcuts
-------------------
-
-Alt+z : Undo 
-Alt+x : Redo 
-Alt+s : Commit
-Alt+d : Show CommitInfo dialog
-
---------------------------------------
-Usage: Evaluate the following commands
---------------------------------------
-
-ManualCommit (Default) - Only do commits manually.
-
-AutoCommit - Turn on automatic commits. Every time a cell is evaluated a new commit is made. (This can lead to a lot of files)
-
-CronCommit[n] - makes a new commit every n minutes.
-
-CommitNow - Making a commit
-CommitInfo - Show a list of all Versions
-CommitClean - Remove all commited files
-
-Undo - Undo to the previous commit
-Redo - Undo to the next commit
-GotoCommit[n] - Go to the nth version
-";
 
 
-CommitNow::usage="Makes a commit of the current Notebook";
-ManualCommit::usage="Set the commiting mode to manual";
-AutCommit::usage="Commit before the each evaluation";
-CronCommit::usage="CronCommit[n] makes an automatic commit every n minutes";
-
-
- ];
 
 (*
 Copyright 2012 Jens Boberski
