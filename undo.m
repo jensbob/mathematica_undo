@@ -16,7 +16,7 @@ Alt+s : Commit
 Alt+d : Show CommitInfo dialog
 
 Functions Defined:
-ManualCommit, AutoCommit, CronCommit[n], CommitInfo, CommitClean, CommitNow Undo, Redo, GotoCommit[n]
+ManualCommit, AutoCommit, CronCommit[n], CommitInfo, CommitClean, CommitNow Undo, Redo, GotoCommit[n], SetVersionLimit[n]
 ";
 
 
@@ -29,11 +29,14 @@ CommitInfo::usage="Opens a dialog with the commited versions.";
 Undo::usage="Moves back to the previous version. If you are currently working on the latest version (highest version number) the current changes are automaically commited. Otherwise data might be lost.";
 Redo::usage="Moves forward in the commited versions.";
 GotoCommit::usage="GotoCommit[n] loads version n.";
+SetVersionLimit::usage="SetVersionLimit[n] sets the limit of saved commits to n."
 
 Begin["`Private`"];
 
 warning1 = "You need to save the notebook, in order \n to use the commiting and undo system.";
 AutoCo"manual";
+VersionLimit=1000;
+SetVersionLimit[n_]:=(VersionLimit=n;);
 
 (*Define copy and delete for different operating systmes*)
    OSCopy=If[$OperatingSystem == "Windows","copy","cp"];
@@ -59,7 +62,7 @@ CommitInfo :=
 		  Column[{"Nothing Commited", "", "Commit mode: " <> ToString[AutoCo],"",Item[DefaultButton[], Alignment -> Right]}]
 			  ],
 	      CreateDialog[
-		  Column[{"Currently working on version: " <> ToString[RecentVersion], "", "Commit mode: " <> ToString[AutoCo], "", Row[{TableForm[Take[CommitList,Max[-30,-Length[CommitList]]]]}], "", Item[DefaultButton[], Alignment -> Right]}] (*open dialog with a list of the last 30 versions*)
+		  Column[{"Currently working on version: " <> ToString[RecentVersion], "", "Backed up versions limited to the last: " <>ToString[VersionLimit],"","Commit mode: " <> ToString[AutoCo], "", Row[{TableForm[Take[CommitList,Max[-VersionLimit,-Length[CommitList]]]]}], "", Item[DefaultButton[], Alignment -> Right]}] (*open dialog with a list of the last 30 versions*)
 			  ];
 	     ];
 	  ];
@@ -83,7 +86,7 @@ CommitInfo :=
 	     	      (*Save the Notebook*)
 	      NotebookSave[EvaluationNotebook[], nb];
 	      (*Create Backup Copy*)
-	      Import["!"<>ToString[OSCopy]<>" "<> ToString[nb] <> " " <> ToString[nb] <> ToString[RecentVersion] <> ".bak", "Table"];
+	      Import["!"<>ToString[OSCopy]<>" "<> ToString[nb] <> " " <> ToString[nb] <> ToString[Mod[RecentVersion,VersionLimit,1]] <> ".bak", "Table"];
 	      (*update undo file*)
 	      Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, CommitList}];
 	     ];
@@ -116,7 +119,7 @@ CommitInfo :=
 		 {RecentVersion, MaxVersion, CommitList} = Import[ToString[nb] <> ".undo.mx"];
 		]; 
 
-	      Import["!"<>ToString[OSCopy]<>" " <> ToString[nb] <> ToString[RecentVersion-1] <> ".bak" <> " " <> ToString[nb], "Table"]; (*copy last backup on notebook file*)
+	      Import["!"<>ToString[OSCopy]<>" " <> ToString[nb] <> ToString[Mod[RecentVersion-1,VersionLimit,1]] <> ".bak" <> " " <> ToString[nb], "Table"]; (*copy last backup on notebook file*)
 	      If[RecentVersion>1,
 		 FrontEndExecute[FrontEndToken["Revert",False]];(*false - show no warning*)
 		 RecentVersion -= 1;
@@ -135,7 +138,7 @@ CommitInfo :=
 		]; 
 	      If[RecentVersion < MaxVersion, 
 		 RecentVersion += 1; 
-		 Import["!"<>ToString[OSCopy]<>" " <> ToString[nb] <> ToString[RecentVersion] <> ".bak" <> " " <> ToString[nb], "Table"]; 
+		 Import["!"<>ToString[OSCopy]<>" " <> ToString[nb] <> ToString[Mod[RecentVersion,VersionLimit,1]] <> ".bak" <> " " <> ToString[nb], "Table"]; 
 		 FrontEndExecute[FrontEndToken["Revert",False]];
 		];
 	      Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, CommitList}];
@@ -151,7 +154,7 @@ CommitInfo :=
 		]; 
 	      If[a>=1&&a<=MaxVersion&&RecentVersion!=0,
 		 RecentVersion=a;
-		 Import["!"<>ToString[OSCopy]<>" "<>ToString[nb]<>ToString[RecentVersion]<>".bak"<> " "<>ToString[nb],"Table"];
+		 Import["!"<>ToString[OSCopy]<>" "<>ToString[nb]<>ToString[Mod[RecentVersion,VersionLimit,1]]<>".bak"<> " "<>ToString[nb],"Table"];
 		 FrontEndExecute[FrontEndToken["Revert",False]];,Print["Invalid Version"]
 		];
 	     ] ;
