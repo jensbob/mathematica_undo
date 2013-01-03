@@ -1,33 +1,40 @@
 (* ::Package:: *)
+$ContextPath = Union[$ContextPath, {"SharedContext`"}]
+Begin["SharedContext`"];
+
 
 BeginPackage["undo`"]
 
-undo::usage="This package adds a poor mans version control and undo functionality to Mathematica notebooks.
+undo::usage="This package adds a poor mans version control and a simple undo functionality to Mathematica notebooks.
 
-For a 'notebook.nb' a version information file ('notebook.nb.undo.mx') is created and every time changes are commited a backup file ('notebook.nb[version].bak') is created. Keyboard shortcuts allow an easy way to commit versions and move in between them.
+For 'notebook.nb':
+* a version information file ('notebook.nb.undo.mx') is created.
+* every time changes are commited a backup file ('notebook.nb[version].bak') is created. 
 
-------------------
+Keyboard shortcuts allow an easy way to commit versions and move in between them.
+
 Keyboard Shortcuts
 ------------------
-
 Alt+z : Undo 
 Alt+x : Redo 
 Alt+s : Commit
 Alt+d : Show CommitInfo dialog
+------------------
 
-Functions Defined:
-ManualCommit, AutoCommit, CronCommit[n], CommitInfo, CommitClean, CommitNow Undo, Redo, GotoCommit[n], SetVersionLimit[n]
+Functions Defined: ManualCommit, AutoCommit, CronCommit[n], CommitInfo, CommitClean, CommitNow Undo, Redo, GotoCommit[n], SetVersionLimit[n]
 ";
 
 
-CommitNow::usage="Makes a commit of the current Notebook.";
-ManualCommit::usage="Set the commiting mode to manual.";
-AutCommit::usage="Commit before the each evaluation.";
+CommitNow::usage="CommitNow makes a commit of the current Notebook.";
+ManualCommit::usage="ManualCommit sets the commiting mode to manual.";
+AutoCommit::usage="AutoCommit: Commit before the each evaluation.";
 CronCommit::usage="CronCommit[n] makes an automatic commit every n minutes.";
-CommitClean::usage="Deletes all backup files.";
-CommitInfo::usage="Opens a dialog with the commited versions.";
-Undo::usage="Moves back to the previous version. If you are currently working on the latest version (highest version number) the current changes are automaically commited. Otherwise data might be lost.";
-Redo::usage="Moves forward in the commited versions.";
+CommitClean::usage="CommitClean deletes all backup files.";
+CommitInfo::usage="CommitInfo opens a dialog with the commited versions.";
+Undo::usage="Undo moves back to the previous version. 
+
+If you are currently working on the latest version (highest version number) the current changes are automaically commited. Otherwise data might be lost.";
+Redo::usage="Redo moves forward in the commited versions.";
 GotoCommit::usage="GotoCommit[n] loads version n.";
 SetVersionLimit::usage="SetVersionLimit[n] sets the limit of saved commits to n."
 
@@ -185,7 +192,7 @@ CommitInfo :=
 
 End[];
 
-Protect[ManualCommit, AutoCommit, CronCommit, CommitInfo, CommitClean, CommitNow, Undo, Redo, GotoCommit]
+Protect[ManualCommit, AutoCommit, CronCommit, CommitInfo, CommitClean, CommitNow, Undo, Redo, GotoCommit, SetVersionLimit]
 
 EndPackage[];
 
@@ -264,7 +271,7 @@ FrontEndExecute[
     MenuKey["s", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]];
 
-
+End[];
 
 
 (*
