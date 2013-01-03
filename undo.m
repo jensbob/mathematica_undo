@@ -1,7 +1,4 @@
 (* ::Package:: *)
-$ContextPath = Union[$ContextPath, {"SharedContext`"}]
-Begin["SharedContext`"];
-
 
 BeginPackage["undo`"]
 
@@ -271,7 +268,6 @@ FrontEndExecute[
     MenuKey["s", Modifiers -> {"Command"}],
     System`MenuEvaluator -> Automatic]}]];
 
-End[];
 
 
 (*
