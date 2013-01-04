@@ -1,4 +1,10 @@
 (* ::Package:: *)
+(*TODO - menu  for auto manual and cron commit
+       - button for Clean and warning
+       - button for set limit
+       - button for goto commit
+*)
+
 
 (*update undo file*)
 undo`UpdateInfoFile[nb_,RecentVersion_, MaxVersion_, CommitList_,VersionLimit_,CommitMode_]:=Export[ToString[nb] <> ".undo.mx", {RecentVersion, MaxVersion, CommitList,VersionLimit,CommitMode}];
@@ -130,8 +136,8 @@ undo`GotoCommit[nb_,a_]:= Module[{RecentVersion, MaxVersion, CommitList, Version
 				FrontEndExecute[FrontEndToken["Revert",False]];,Print["Invalid Version"];
 			       ];
 	      undo`UpdateInfoFile[nb,RecentVersion, MaxVersion, CommitList,VersionLimit,CommitMode];
-			       ];
 				];
+			       
 		
 (*----- Auto and manual commit ----*)
 
@@ -168,9 +174,8 @@ undo`CronCommit[nb_, n_] :=
       Import[ToString[nb] <> ".undo.mx"];];
    CommitMode = "every " <> ToString[n] <> " min";
    NotebookEvaluate[Clear@$Pre];
-   Print[nb];
    undo`croncommit[nb] = CreateScheduledTask[undo`Commit[nb], n*60];
-   StartScheduledTask[croncommit[nb]];
+   StartScheduledTask[undo`croncommit[nb]];
    undo`UpdateInfoFile[nb, RecentVersion, MaxVersion, CommitList, 
     VersionLimit, CommitMode];];
 
